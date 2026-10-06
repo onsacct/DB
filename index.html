@@ -444,18 +444,24 @@
     display:inline-block; margin-top:6px; background:none; border:none; color:var(--green);
     font-family:'Tajawal', sans-serif; font-size:11.5px; cursor:pointer; padding:0; text-decoration:underline;
   }
-  .admin-matrix-wrap{overflow-x:auto; border:1px solid var(--line); border-radius:8px; margin-bottom:12px;}
-  table.admin-matrix{border-collapse:collapse; font-size:11.5px; white-space:nowrap;}
-  table.admin-matrix th, table.admin-matrix td{border:1px solid var(--line); padding:5px 7px; text-align:center;}
+  /* The permissions table scrolls inside its own box (both directions),
+     so its header row stays pinned at the top while you scroll down the
+     names, and the name column stays pinned while you scroll sideways. */
+  .admin-matrix-wrap{overflow:auto; max-height:min(62vh, 560px); border:1px solid var(--line); border-radius:8px; margin-bottom:12px; background:#fff;}
+  table.admin-matrix{border-collapse:separate; border-spacing:0; font-size:11.5px; white-space:nowrap;}
+  table.admin-matrix th, table.admin-matrix td{border-bottom:1px solid var(--line); border-inline-end:1px solid var(--line); padding:5px 7px; text-align:center; background:#fff;}
   table.admin-matrix th.admin-matrix-head-wrap{white-space:normal; min-width:90px; max-width:130px; line-height:1.35; vertical-align:bottom;}
-  table.admin-matrix thead th{background:var(--paper-deep); color:var(--ink); position:sticky; top:0; z-index:1;}
+  table.admin-matrix thead th{background:var(--paper-deep); color:var(--ink); position:sticky; top:0; z-index:2; box-shadow:0 1px 0 var(--line);}
   table.admin-matrix td.admin-matrix-sticky, table.admin-matrix th.admin-matrix-sticky{
-    position:sticky; inset-inline-start:0; background:#fff; text-align:right; z-index:2; font-weight:700;
+    position:sticky; inset-inline-start:0; text-align:right; z-index:1; white-space:normal;
+    min-width:120px; max-width:170px; box-shadow:-1px 0 0 var(--line) inset;
   }
-  table.admin-matrix th.admin-matrix-sticky{background:var(--paper-deep); z-index:3;}
-  table.admin-matrix td.admin-matrix-email{inset-inline-start:72px; font-weight:400; color:var(--ink-soft); font-size:11px;}
-  table.admin-matrix th.admin-matrix-email{inset-inline-start:72px;}
-  tr.admin-matrix-unknown td.admin-matrix-sticky{color:#9b2c2c; font-style:italic;}
+  table.admin-matrix th.admin-matrix-sticky{background:var(--paper-deep); z-index:3; vertical-align:bottom;}
+  .admin-matrix-name{font-weight:700; color:var(--ink); line-height:1.35;}
+  .admin-matrix-email{font-size:10.5px; color:var(--ink-soft); direction:ltr; text-align:right; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  table.admin-matrix tbody tr:hover td{background:#fbf7ec;}
+  table.admin-matrix input[type=checkbox]{width:16px; height:16px; cursor:pointer; accent-color:var(--green);}
+  tr.admin-matrix-unknown .admin-matrix-name{color:#9b2c2c; font-style:italic;}
   .admin-save-bar{
     position:sticky; bottom:-16px; margin:14px -16px -16px; padding:10px 16px; background:var(--paper);
     border-top:1px solid var(--line); display:flex; align-items:center; justify-content:flex-end; gap:10px;
@@ -765,6 +771,7 @@
 
         <div class="admin-save-bar">
           <div id="adminSaveMsg" class="admin-error" style="display:none;"></div>
+          <button type="button" id="adminRefreshBtn" class="admin-btn" title="يمسح ذاكرة الخادم المؤقتة فيُعاد قراءة الجداول في التحميل التالي">🔄 تحديث البيانات</button>
           <button type="button" id="adminSaveAllBtn" class="admin-btn admin-btn-primary">💾 حفظ كل التغييرات</button>
         </div>
       </div>
@@ -2477,27 +2484,26 @@ function startApp(){
 
   function renderMatrix(){
     const rows = buildMatrixRows();
-    let thead = '<thead><tr><th class="admin-matrix-sticky">الاسم</th><th class="admin-matrix-sticky admin-matrix-email">البريد</th>';
+    let thead = '<thead><tr><th class="admin-matrix-sticky">الشخص</th>';
     state.items.forEach((it, i) => { thead += `<th class="admin-matrix-head-wrap" title="${escHtml(it.name)}">${escHtml(it.name || it.id)}</th>`; });
     ACCESS_RULE_NAMES_CLIENT.forEach(name => { thead += `<th title="${escHtml(ACCESS_RULE_LABELS[name])}">${escHtml(ACCESS_RULE_SHORT_LABELS[name])}</th>`; });
     thead += '</tr></thead>';
 
     let tbody = '<tbody>';
     if (!rows.length){
-      tbody += `<tr><td colspan="${2 + state.items.length + ACCESS_RULE_NAMES_CLIENT.length}" class="admin-hint">لا يوجد أحد في تبويب Contacts (العمودان J/K) بعد.</td></tr>`;
+      tbody += `<tr><td colspan="${1 + state.items.length + ACCESS_RULE_NAMES_CLIENT.length}" class="admin-hint">لا يوجد أحد في تبويب Contacts (العمودان J/K) بعد.</td></tr>`;
     }
     rows.forEach(row => {
       tbody += `<tr${row.known ? '' : ' class="admin-matrix-unknown"'}>` +
-        `<td class="admin-matrix-sticky">${escHtml(row.name)}</td>` +
-        `<td class="admin-matrix-sticky admin-matrix-email">${escHtml(row.email)}</td>`;
+        `<td class="admin-matrix-sticky"><div class="admin-matrix-name">${escHtml(row.name)}</div><div class="admin-matrix-email" title="${escHtml(row.email)}">${escHtml(row.email)}</div></td>`;
       state.items.forEach((it, i) => {
         const checked = emailInList(it.allowed, row.email) ? 'checked' : '';
-        tbody += `<td><input type="checkbox" data-matrix-item="${i}" data-matrix-email="${escHtml(row.email)}" ${checked}/></td>`;
+        tbody += `<td><input type="checkbox" data-matrix-item="${i}" data-matrix-email="${escHtml(row.email)}" title="${escHtml(row.name)} — ${escHtml(it.name || it.id)}" aria-label="${escHtml(row.name)} — ${escHtml(it.name || it.id)}" ${checked}/></td>`;
       });
       ACCESS_RULE_NAMES_CLIENT.forEach(name => {
         const rule = state.accessRules[name] || { allowed: [] };
         const checked = emailInList(rule.allowed, row.email) ? 'checked' : '';
-        tbody += `<td><input type="checkbox" data-matrix-rule="${name}" data-matrix-email="${escHtml(row.email)}" ${checked}/></td>`;
+        tbody += `<td><input type="checkbox" data-matrix-rule="${name}" data-matrix-email="${escHtml(row.email)}" title="${escHtml(row.name)} — ${escHtml(ACCESS_RULE_LABELS[name])}" aria-label="${escHtml(row.name)} — ${escHtml(ACCESS_RULE_LABELS[name])}" ${checked}/></td>`;
       });
       tbody += '</tr>';
     });
@@ -2542,6 +2548,16 @@ function startApp(){
       .withFailureHandler(err => showMsg(itemsMsg, String(err && err.message || err), false))
       .getAdminPanelData(adminPin);
   }
+
+  // Clears the server's memory so the next page load reads the
+  // spreadsheets fresh — for changes made outside the panel that the
+  // automatic refresh didn't catch.
+  document.getElementById('adminRefreshBtn').addEventListener('click', () => {
+    serverRun
+      .withSuccessHandler(() => showMsg(saveMsg, 'تم تحديث البيانات. أعد تحميل الصفحة لرؤية أحدث نسخة.', true))
+      .withFailureHandler(err => showMsg(saveMsg, String(err && err.message || err), false))
+      .clearCaches(adminPin);
+  });
 
   saveAllBtn.addEventListener('click', () => {
     const payload = { items: state.items, accessRules: state.accessRules };
