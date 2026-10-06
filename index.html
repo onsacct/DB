@@ -607,6 +607,15 @@
     background:var(--green); color:var(--paper); cursor:pointer; text-decoration:none;
   }
   .auth-btn-light{background:#fff; color:var(--green);}
+
+  /* Everything lines up with the page content: the header's contents,
+     the line between the two dashboards, and the footer use the same
+     side inset as the sections (the green band itself stays full width). */
+  header{padding-inline:var(--section-inset);}
+  .header-inner{max-width:calc(var(--content-max) - 2 * var(--section-inset));}
+  .dashboard-section{border-bottom:none; position:relative;}
+  .dashboard-section::after{content:""; position:absolute; bottom:0; left:var(--section-inset); right:var(--section-inset); border-bottom:2px solid var(--line);}
+  .wrap > footer{width:calc(100% - 2 * var(--section-inset)); max-width:calc(var(--content-max) - 2 * var(--section-inset));}
 </style>
 </head>
 <body>
