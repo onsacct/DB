@@ -1,0 +1,2629 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>سِجل الأُنس</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&amp;family=Tajawal:wght@400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<style>
+  :root{
+    --paper:#EFE9D6; --paper-deep:#E4DCC3; --ink:#2A2418; --ink-soft:#5B5340;
+    --green:#1F3B32; --green-deep:#152B25; --gold:#B4872B; --gold-soft:#D9B872;
+    --line:#c9bd9a; --form-tint:#8C5A3A; --sheet-tint:#1F6E5C;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper); color:var(--ink); font-family:'Tajawal', sans-serif;
+    min-height:100vh; display:flex; flex-direction:column;
+    background-image:
+      radial-gradient(circle at 100% 0%, rgba(180,135,43,0.06), transparent 45%),
+      radial-gradient(circle at 0% 100%, rgba(31,59,50,0.05), transparent 40%);
+  }
+  a{color:inherit; text-decoration:none;}
+  button{font-family:inherit;}
+  ::selection{background:var(--gold-soft); color:var(--ink);}
+  a:focus-visible, button:focus-visible, select:focus-visible{outline:2px solid var(--gold); outline-offset:3px; border-radius:2px;}
+  @media (prefers-reduced-motion: reduce){*{animation-duration:0.001ms !important; transition-duration:0.001ms !important;}}
+  .wrap{max-width:1400px; margin:0 auto; padding:0 0 24px; width:100%; flex:1; display:flex; flex-direction:column;}
+  header{
+    background:var(--green); color:var(--paper); padding:0 clamp(14px,4vw,32px);
+    position:sticky; top:0; z-index:100; height:64px; display:flex; align-items:center;
+    overflow:hidden; border-bottom:5px solid var(--gold); flex:none;
+  }
+  header::before{
+    content:""; position:absolute; inset:0;
+    background:repeating-linear-gradient(135deg, rgba(255,255,255,0.025) 0 2px, transparent 2px 26px);
+    pointer-events:none;
+  }
+  .header-inner{position:relative; display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:nowrap; width:100%; min-width:0;}
+  .brand{display:flex; align-items:center; gap:12px; min-width:0; flex:1 1 auto;}
+  .brand > div{min-width:0;}
+  .seal{
+    width:40px; height:40px; flex:none; border:2px solid var(--gold-soft); border-radius:50%;
+    display:flex; align-items:center; justify-content:center; font-family:'Amiri', serif; font-size:19px;
+    color:var(--gold-soft); background:radial-gradient(circle, rgba(180,135,43,0.15), transparent 70%);
+  }
+  h1{font-family:'Amiri', serif; font-weight:700; font-size:clamp(18px,4vw,26px); margin:0; letter-spacing:0.3px; line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .tagline{margin:2px 0 0; color:var(--gold-soft); font-size:12.5px; font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .header-meta{font-size:11px; color:rgba(239,233,214,0.85); line-height:1.5; white-space:nowrap; flex:none; text-align:left;}
+  .header-meta b{color:var(--gold-soft); font-weight:700;}
+
+  /* ===================== Dashboard section ===================== */
+  .dashboard-section{padding:22px clamp(14px,4vw,32px) 24px; border-bottom:2px solid var(--line); margin-bottom:8px;}
+  .dash-topbar{display:flex; align-items:flex-start; justify-content:space-between; gap:16px; flex-wrap:wrap; margin-bottom:18px;}
+  .dash-title{flex:1 1 280px; min-width:0;}
+  .dash-title h2{font-family:'Amiri', serif; font-weight:700; font-size:clamp(20px,3.8vw,26px); margin:0; color:var(--green); letter-spacing:0.2px;}
+  .dash-title .dash-sub{margin:4px 0 0; color:var(--ink-soft); font-size:13.5px; line-height:1.4;}
+
+  .week-controls{display:flex; align-items:center; gap:12px; flex-wrap:wrap;}
+  .week-picker{display:flex; align-items:center; gap:8px;}
+  .week-picker label{font-size:13px; color:var(--ink-soft); font-weight:700; white-space:nowrap;}
+
+  select{
+    appearance:none; -webkit-appearance:none;
+    background:var(--green) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' stroke='%23D9B872' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") left 14px center / 11px no-repeat;
+    color:var(--paper); border:1px solid rgba(217,184,114,0.4); border-radius:20px;
+    padding:8px 36px 8px 16px; font-family:'Tajawal', sans-serif; font-size:13.5px; font-weight:600; cursor:pointer;
+    box-shadow:0 2px 5px rgba(0,0,0,0.06); transition:border-color 0.2s;
+  }
+  select:hover{border-color:var(--gold);}
+  option{background:var(--green); color:var(--paper);}
+
+  /* KPI Summary Banner */
+  .summary-banner{
+    display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:12px;
+    margin-bottom:20px;
+  }
+  .summary-pill{
+    background:rgba(255,255,255,0.7); border:1px solid var(--line); border-radius:10px;
+    padding:12px 16px; display:flex; align-items:center; justify-content:space-between; gap:12px;
+    box-shadow:0 2px 4px rgba(42,36,24,0.02); transition:border-color 0.2s;
+  }
+  .summary-pill:hover{border-color:var(--gold);}
+  .summary-pill.highlight{
+    background:linear-gradient(135deg, var(--green) 0%, var(--green-deep) 100%);
+    color:var(--paper); border-color:rgba(180,135,43,0.4);
+  }
+  .summary-pill.highlight .pill-label{color:var(--gold-soft);}
+  .summary-pill.highlight .pill-sub{color:rgba(239,233,214,0.75);}
+  .pill-label{font-size:12.5px; font-weight:700; color:var(--ink-soft); display:flex; align-items:center; gap:6px;}
+  .pill-num{font-family:'Amiri', serif; font-weight:700; font-size:26px; line-height:1.1; margin-top:2px; color:var(--ink);}
+  .summary-pill.highlight .pill-num{color:var(--paper);}
+  .pill-sub{font-size:11.5px; color:var(--ink-soft); margin-top:2px;}
+  .pill-icon{
+    width:38px; height:38px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    flex:none; background:var(--paper-deep); color:var(--green); border:1px solid var(--line);
+  }
+  .summary-pill.highlight .pill-icon{
+    background:rgba(217,184,114,0.18); border-color:var(--gold-soft); color:var(--gold-soft);
+  }
+
+  /* Accordion header row: holds the toggle button + view-switcher as siblings (not nested buttons) */
+  .cat-head-row{display:flex; align-items:stretch; border-radius:8px; overflow:hidden;}
+  .cat-head-row .cat-head{flex:1; width:auto;}
+  .cat-head-row .view-toggle-group{flex:none; align-self:center; margin-inline-end:14px;}
+  .category.open .cat-head-row{background:var(--green);}
+
+  /* View switcher bar */
+  .view-toggle-group{
+    display:inline-flex; background:var(--paper-deep); border:1px solid var(--line);
+    border-radius:24px; padding:2px; gap:2px;
+  }
+  .category.open .view-toggle-group{
+    background:rgba(239,233,214,0.15); border-color:rgba(217,184,114,0.3);
+  }
+  .view-toggle-btn{
+    display:inline-flex; align-items:center; gap:6px; padding:5px 12px; border-radius:18px;
+    border:none; background:transparent; font-size:12px; font-weight:700; color:var(--ink-soft);
+    cursor:pointer; transition:all 0.18s ease;
+  }
+  .category.open .view-toggle-btn{
+    color:var(--paper);
+  }
+  .view-toggle-btn.active{
+    background:var(--green); color:var(--paper); box-shadow:0 1px 3px rgba(0,0,0,0.1);
+  }
+  .category.open .view-toggle-btn.active{
+    background:var(--gold); color:var(--green-deep);
+  }
+  .view-toggle-btn svg{width:13px; height:13px; flex:none;}
+
+  /* Compact Table Styling */
+  .table-container{
+    background:rgba(255,255,255,0.75); border:1px solid var(--line); border-radius:10px;
+    overflow-x:auto; box-shadow:0 2px 6px rgba(42,36,24,0.03); margin-bottom:10px;
+  }
+  .data-table{width:100%; border-collapse:collapse; text-align:right; font-size:13.5px;}
+  .data-table th{
+    background:var(--paper-deep); color:var(--ink); font-weight:700; font-size:13px;
+    padding:11px 14px; border-bottom:2px solid var(--line); white-space:nowrap;
+  }
+  .data-table td{
+    padding:11px 14px; border-bottom:1px solid rgba(201,189,154,0.45); vertical-align:middle;
+    transition:background 0.15s ease;
+  }
+  .data-table tbody tr:hover td{background:rgba(180,135,43,0.05);}
+  .data-table tbody tr:last-child td{border-bottom:none;}
+  .data-table .cell-idx{font-family:'Amiri', serif; font-weight:700; color:var(--gold); font-size:15px; width:34px; text-align:center;}
+  .data-table .cell-class{font-weight:700; color:var(--ink); min-width:210px;}
+  .stage-badge{
+    display:inline-block; font-size:10.5px; font-weight:700; padding:2px 7px;
+    border-radius:10px; margin-inline-start:6px; vertical-align:middle;
+  }
+  .stage-elem{background:rgba(31,59,50,0.1); color:var(--green);}
+  .stage-mid{background:rgba(180,135,43,0.15); color:#8a6418;}
+  .stage-high{background:rgba(140,90,58,0.13); color:var(--form-tint);}
+
+  .prog-wrapper{display:flex; align-items:center; gap:10px; min-width:140px;}
+  .prog-track{
+    flex:1; height:7px; background:var(--paper-deep); border-radius:4px;
+    border:1px solid rgba(201,189,154,0.7); overflow:hidden;
+  }
+  .prog-bar{
+    height:100%; border-radius:4px; background:linear-gradient(90deg, var(--gold), var(--gold-soft));
+    transition:width 0.4s ease;
+  }
+  .prog-pct{font-weight:700; font-family:'Amiri', serif; font-size:15px; color:var(--ink); min-width:38px; text-align:left;}
+
+  /* Status Badges */
+  .status-tag{
+    display:inline-flex; align-items:center; justify-content:center; padding:4px 12px;
+    border-radius:20px; font-size:12px; font-weight:700; white-space:nowrap;
+  }
+  .status-tag.excellent{background:rgba(31,110,92,0.12); color:#155446; border:1px solid rgba(31,110,92,0.25);}
+  .status-tag.vgood{background:rgba(180,135,43,0.12); color:#7d5c17; border:1px solid rgba(180,135,43,0.28);}
+  .status-tag.attention{background:rgba(190,55,55,0.1); color:#9b2c2c; border:1px solid rgba(190,55,55,0.22);}
+  .status-tag.unrecorded{display:inline-flex; align-items:center; gap:5px; background:rgba(217,88,45,0.16); color:#9a3412; border:1px solid rgba(217,88,45,0.4);}
+  .status-tag.unrecorded svg{width:12px; height:12px; flex:none;}
+  tr.unrecorded-row td{background:rgba(217,88,45,0.07) !important;}
+  .unrecorded-note{display:inline-flex; align-items:center; gap:4px; font-size:11.5px; color:#9a3412; font-weight:600;}
+  .unrecorded-note svg{flex:none;}
+  .card-footer-info svg{width:12px; height:12px; flex:none; vertical-align:middle;}
+  .class-card.unrecorded-card{border-color:#e08a5c; background:rgba(217,88,45,0.06);}
+
+  /* Cards Grid Alternative View */
+  .class-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(240px, 1fr)); gap:14px;}
+  .class-card{
+    background:rgba(255,255,255,0.65); border:1px solid var(--line); border-radius:10px;
+    padding:14px 16px; box-shadow:0 1px 4px rgba(42,36,24,0.02); transition:transform 0.15s, border-color 0.15s;
+    display:flex; flex-direction:column; justify-content:space-between;
+  }
+  .class-card:hover{border-color:var(--gold); transform:translateY(-2px);}
+  .card-top{display:flex; justify-content:space-between; align-items:flex-start; gap:8px; margin-bottom:10px;}
+  .class-name{font-size:13.5px; font-weight:700; color:var(--ink); line-height:1.4;}
+  .class-figures{display:flex; align-items:baseline; justify-content:space-between; margin-bottom:10px;}
+  .class-figures .attended{font-family:'Amiri', serif; font-weight:700; font-size:24px; color:var(--ink);}
+  .class-figures .over{font-size:12.5px; color:var(--ink-soft); margin-inline-start:4px;}
+  .class-figures .rate{font-family:'Amiri', serif; font-weight:700; font-size:17px; color:var(--gold);}
+  .bar-track{height:7px; border-radius:4px; background:var(--paper-deep); overflow:hidden; border:1px solid rgba(201,189,154,0.7);}
+  .bar-fill{height:100%; border-radius:4px; background:linear-gradient(90deg, var(--gold), var(--gold-soft)); transition:width 0.4s ease;}
+  .card-footer-info{display:flex; justify-content:space-between; align-items:center; font-size:11.5px; color:var(--ink-soft); margin-top:8px;}
+
+  .empty-state-card{
+    background:rgba(255,255,255,0.5); border:1px dashed var(--line); border-radius:10px;
+    padding:32px 20px; text-align:center; color:var(--ink-soft); font-size:14px;
+  }
+
+  /* ===================== Student stats section ===================== */
+  .stats-tabs{display:flex; flex-wrap:wrap; gap:6px; padding:14px 16px 10px;}
+  .stats-tab-btn{
+    display:inline-flex; align-items:center; gap:6px; padding:7px 14px; border-radius:18px;
+    border:1px solid var(--line); background:rgba(255,255,255,0.6); font-size:12.5px; font-weight:700;
+    color:var(--ink-soft); cursor:pointer; transition:all 0.18s ease;
+  }
+  .stats-tab-btn:hover{border-color:var(--gold); color:var(--ink);}
+  .stats-tab-btn.active{background:var(--green); color:var(--paper); border-color:var(--green);}
+  .stats-panel{padding:4px 16px 16px;}
+  .rank-badge{
+    display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px;
+    border-radius:50%; background:var(--paper-deep); border:1px solid var(--line);
+    font-family:'Amiri', serif; font-weight:700; font-size:14px; color:var(--gold);
+  }
+  .rank-badge.medal-1{background:linear-gradient(135deg,#f4d888,#c9a227); color:#4a3a0a; border-color:#c9a227;}
+  .rank-badge.medal-2{background:linear-gradient(135deg,#e6e6e6,#b8b8b8); color:#3a3a3a; border-color:#b8b8b8;}
+  .rank-badge.medal-3{background:linear-gradient(135deg,#e0b088,#b97b4e); color:#3a2311; border-color:#b97b4e;}
+  .filter-row td{background:rgba(239,233,214,0.55); padding:5px 8px; border-bottom:2px solid var(--line); position:relative;}
+  .col-filter-wrap{position:relative;}
+  .col-filter-btn{
+    width:100%; box-sizing:border-box; display:flex; align-items:center; justify-content:space-between; gap:4px;
+    font-family:'Tajawal', sans-serif; font-size:12px; padding:5px 8px; border:1px solid var(--line); border-radius:6px;
+    background:#fff; color:var(--ink-soft); cursor:pointer; text-align:right;
+  }
+  .col-filter-btn:hover{border-color:var(--gold);}
+  .col-filter-btn.active{border-color:var(--green); color:var(--green); font-weight:700; background:rgba(31,59,50,0.05);}
+  .col-filter-btn-label{overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .col-filter-btn svg{width:10px; height:10px; flex:none; transition:transform .15s ease;}
+  .col-filter-btn.open svg{transform:rotate(180deg);}
+  .col-filter-panel{
+    position:absolute; top:calc(100% + 4px); right:0; z-index:60; min-width:170px; max-width:260px;
+    max-height:280px; background:#fff; border:1px solid var(--line); border-radius:8px;
+    box-shadow:0 6px 18px rgba(42,36,24,0.18); padding:6px; display:none;
+    flex-direction:column;
+  }
+  .col-filter-panel.open{display:flex;}
+  .col-filter-search-wrap{flex:none; padding-bottom:6px; margin-bottom:4px; border-bottom:1px solid var(--line);}
+  .col-filter-search{
+    width:100%; box-sizing:border-box; font-family:'Tajawal', sans-serif; font-size:12px;
+    padding:5px 8px; border:1px solid var(--line); border-radius:6px; color:var(--ink); background:#fff;
+  }
+  .col-filter-search:focus{outline:none; border-color:var(--gold);}
+  .col-filter-options{flex:1; min-height:0; overflow-y:auto;}
+  .col-filter-option{display:flex; align-items:center; gap:7px; padding:5px 6px; border-radius:5px; font-size:12.5px; color:var(--ink); cursor:pointer;}
+  .col-filter-option:hover{background:rgba(180,135,43,0.08);}
+  .col-filter-option input{accent-color:var(--green); cursor:pointer; flex:none; margin:0;}
+  .col-filter-option.search-hidden{display:none;}
+  .col-filter-empty{padding:8px 6px; font-size:12px; color:var(--ink-soft);}
+  .col-filter-actions{display:flex; justify-content:space-between; gap:6px; padding:5px 6px 2px; border-top:1px solid var(--line); margin-top:4px; flex:none;}
+  .col-filter-actions button{background:none; border:none; color:var(--gold); font-size:11px; font-weight:700; cursor:pointer; padding:2px 4px;}
+  .col-filter-actions button:hover{text-decoration:underline;}
+  tr.no-filter-results td{text-align:center; padding:22px; color:var(--ink-soft); font-size:13px;}
+  .contact-actions{display:flex; align-items:center; justify-content:center; gap:6px;}
+  .contact-btn{
+    display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px;
+    border-radius:50%; border:1px solid var(--line); background:#fff; color:var(--ink); cursor:pointer;
+    text-decoration:none; transition:background .15s, color .15s, border-color .15s;
+  }
+  .contact-btn.call-btn{color:#166534; border-color:#bbf7d0;}
+  .contact-btn.call-btn:hover{background:#166534; color:#fff;}
+  .contact-btn.whatsapp-btn{color:#166534; border-color:#bbf7d0;}
+  .contact-btn.whatsapp-btn:hover{background:#25d366; border-color:#25d366; color:#fff;}
+  .contact-btn-disabled{opacity:.35; cursor:not-allowed;}
+  .contact-actions{flex-wrap:wrap; row-gap:3px;}
+  .last-contact-badge{
+    flex:0 0 100%; text-align:center; font-size:10.5px; color:var(--ink-soft); white-space:nowrap;
+    cursor:default;
+  }
+  .wa-menu{
+    position:absolute; z-index:70; display:none; flex-direction:column; min-width:190px; max-width:260px;
+    background:#fff; border:1px solid var(--line); border-radius:8px; box-shadow:0 6px 18px rgba(42,36,24,0.18);
+    padding:6px;
+  }
+  .wa-menu.open{display:flex;}
+  .wa-menu-item{
+    background:none; border:none; text-align:right; padding:8px 10px; font-family:'Tajawal', sans-serif;
+    font-size:13px; color:var(--ink); cursor:pointer; border-radius:6px;
+  }
+  .wa-menu-item:hover{background:var(--paper-deep);}
+  .panel-toolbar{display:flex; justify-content:flex-end; margin-bottom:8px;}
+  .export-btn{
+    display:inline-flex; align-items:center; gap:6px; background:var(--paper-deep); border:1px solid var(--line);
+    color:var(--ink-soft); font-size:12px; font-weight:700; padding:6px 14px; border-radius:20px; cursor:pointer;
+    transition:all 0.2s ease;
+  }
+  .export-btn:hover{background:var(--line); color:var(--ink);}
+  .export-btn svg{width:13px; height:13px; flex:none;}
+  .week-tag{
+    display:inline-flex; align-items:center; justify-content:center; min-width:24px; padding:3px 5px;
+    border-radius:5px; font-size:10.5px; font-weight:700; white-space:nowrap;
+  }
+  .week-tag.present{background:rgba(31,110,92,0.12); color:#155446;}
+  .week-tag.absent{background:rgba(190,55,55,0.1); color:#9b2c2c;}
+  .week-tag.unrecorded{background:rgba(201,189,154,0.35); color:var(--ink-soft);}
+  .detail-week-cells{display:flex; gap:4px; flex-wrap:nowrap;}
+
+  /* Catalog Sections */
+  .toolbar{display:flex; justify-content:space-between; align-items:center; padding:16px clamp(14px,4vw,32px) 4px;}
+  .toolbar-title{font-family:'Amiri', serif; font-size:20px; font-weight:700; color:var(--green); margin:0;}
+  .toggle-all{background:var(--paper-deep); border:1px solid var(--line); color:var(--ink-soft); font-size:12.5px; font-weight:700; padding:7px 16px; border-radius:20px; cursor:pointer; transition:all 0.2s ease;}
+  .toggle-all:hover{background:var(--line); color:var(--ink);}
+  main{padding:12px clamp(14px,4vw,32px) 8px; flex:1; display:flex; flex-direction:column;}
+  .category{border:1px solid var(--line); border-radius:8px; margin-bottom:12px; background:rgba(255,255,255,0.45); overflow:hidden; box-shadow:0 1px 3px rgba(42,36,24,0.03); transition:border-color 0.2s;}
+  .category:hover{border-color:var(--gold);}
+  /* A category reduced by permissions to a single visible item, or the
+     whole directory when it's the only section on the page — shown
+     flat/open, not as a clickable accordion header (see buildList() and
+     the outer "forms" accordion script). */
+  .category.single-item:hover{border-color:var(--line);}
+  .cat-head-static{cursor:default;}
+  .cat-head-static:hover{background:transparent;}
+  .cat-head-static .chev{display:none;}
+  .cat-head-static .entry-actions{flex:none;}
+  .cat-head{width:100%; display:flex; align-items:center; gap:12px; padding:14px 16px; background:transparent; border:none; cursor:pointer; text-align:right; color:var(--ink); transition:background 0.2s ease;}
+  .cat-head .num{font-family:'Amiri', serif; font-size:16px; font-weight:700; color:var(--gold); flex:none; width:24px;}
+  .cat-head .titles{flex:1; min-width:0;}
+  .cat-head .lbl{font-weight:700; font-size:16px; line-height:1.35; display:block;}
+  .cat-head .en{display:block; font-weight:400; font-size:11.5px; color:var(--ink-soft); margin-top:2px;}
+  .cat-head .count{font-size:12px; font-weight:600; color:var(--ink-soft); background:var(--paper-deep); padding:3px 10px; border-radius:12px; flex:none;}
+  .cat-head .chev{flex:none; width:18px; height:18px; max-width:18px; max-height:18px; display:inline-flex; align-items:center; justify-content:center; color:var(--ink-soft); transition:transform .2s ease;}
+  .cat-head .chev svg{width:18px; height:18px; max-width:18px; max-height:18px; display:block;}
+  /* Matches only THIS category's own header (either a direct
+     .cat-head, or one wrapped one level down in .cat-head-row, as the
+     attendance section does) — never a nested category's header
+     several levels down inside this one's .cat-body, which must stay
+     styled by its OWN open/closed state instead. */
+  .category.open > .cat-head, .category.open > .cat-head-row > .cat-head{background:var(--green); color:var(--paper);}
+  .category.open > .cat-head .num, .category.open > .cat-head-row > .cat-head .num{color:var(--gold-soft);}
+  .category.open > .cat-head .en, .category.open > .cat-head-row > .cat-head .en{color:rgba(239,233,214,0.75);}
+  .category.open > .cat-head .count, .category.open > .cat-head-row > .cat-head .count{background:rgba(239,233,214,0.15); color:var(--gold-soft);}
+  .category.open > .cat-head .chev, .category.open > .cat-head-row > .cat-head .chev{color:var(--gold-soft); transform:rotate(180deg);}
+  .cat-body{display:none; border-top:1px solid var(--line); background:rgba(255,255,255,0.25);}
+  /* Direct-child combinator only — with the new outer "النماذج
+     وجداول البيانات" wrapper, a plain descendant selector here would
+     also force every NESTED category's cat-body open the moment the
+     outer one is opened, making the inner subject categories unable
+     to fold/unfold on their own. */
+  .category.open > .cat-body{display:block;}
+  .entries{list-style:none; margin:0; padding:4px 8px;}
+  .entry{display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; padding:12px 10px; border-bottom:1px solid var(--line); transition:background 0.15s ease;}
+  .entry:hover{background:rgba(180,135,43,0.06);}
+  .entry:last-child{border-bottom:none;}
+  .entry-main{display:flex; align-items:center; gap:12px; flex:1 1 240px; min-width:0;}
+  .entry-actions{display:flex; align-items:center; gap:12px; flex:none;}
+  .entry .idx{font-family:'Amiri', serif; color:var(--gold); font-size:15px; font-weight:700; flex:none; width:20px;}
+  .entry .name{font-size:15px; font-weight:500; line-height:1.4; min-width:0;}
+  .badge{display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:700; padding:5px 10px; border-radius:4px; white-space:nowrap; flex:none;}
+  .badge svg{width:14px; height:14px; flex:none;}
+  .badge.form{background:rgba(140,90,58,0.12); color:var(--form-tint);}
+  .badge.spreadsheet{background:rgba(31,110,92,0.12); color:var(--sheet-tint);}
+  .open-btn{display:inline-flex; align-items:center; gap:6px; background:var(--green); color:var(--paper); padding:7px 14px; border-radius:4px; font-size:12.5px; font-weight:700; white-space:nowrap; flex:none; border:none; cursor:pointer; transition:background 0.15s ease, transform 0.1s ease;}
+  .open-btn:hover{background:var(--green-deep); transform:translateY(-1px);}
+  .open-btn svg{width:12px; height:12px; transform:scaleX(-1);}
+  footer{text-align:center; font-size:12px; color:var(--ink-soft); padding:14px 14px 6px; border-top:1px solid var(--line); margin-top:20px;}
+
+  /* Admin control panel */
+  #adminPanelTrigger{
+    display:inline-block; margin-top:8px; background:none; border:1px solid var(--line); border-radius:14px;
+    color:var(--ink-soft); font-family:'Tajawal', sans-serif; font-size:11.5px; padding:5px 12px; cursor:pointer;
+  }
+  #adminPanelTrigger:hover{background:var(--paper-deep); color:var(--ink);}
+  .admin-overlay{
+    position:fixed; inset:0; z-index:200; background:rgba(0,0,0,0.45); display:none;
+    align-items:center; justify-content:center; padding:16px;
+  }
+  .admin-overlay.open{display:flex;}
+  .admin-modal{
+    background:var(--paper); border-radius:10px; width:100%; max-width:960px; max-height:95vh;
+    display:flex; flex-direction:column; box-shadow:0 10px 30px rgba(0,0,0,0.3); overflow:hidden;
+  }
+  @media (min-width:700px){
+    .admin-overlay{padding:24px;}
+    .admin-modal{width:92vw;}
+  }
+  .admin-modal-head{
+    display:flex; align-items:center; justify-content:space-between; padding:14px 16px;
+    background:var(--green); color:var(--paper); flex:none;
+  }
+  .admin-modal-head h3{margin:0; font-size:16px;}
+  #adminModalClose{background:none; border:none; color:var(--paper); font-size:16px; cursor:pointer; padding:4px 6px;}
+  .admin-modal-body{padding:16px; overflow-y:auto; flex:1;}
+  .admin-hint{font-size:13px; color:var(--ink-soft); margin:0 0 10px;}
+  .admin-pin-input, .admin-form input[type="text"], .admin-form textarea{
+    width:100%; box-sizing:border-box; font-family:'Tajawal', sans-serif; font-size:13.5px;
+    padding:9px 10px; border:1px solid var(--line); border-radius:6px; color:var(--ink); background:#fff;
+    margin-bottom:8px;
+  }
+  .admin-pin-input:focus, .admin-form input:focus, .admin-form textarea:focus{outline:none; border-color:var(--gold);}
+  .admin-error{background:#fee2e2; color:#9b2c2c; border:1px solid #fecaca; border-radius:6px; padding:8px 10px; font-size:12.5px; margin-bottom:10px;}
+  .admin-success{background:#dcfce7; color:#166534; border:1px solid #bbf7d0; border-radius:6px; padding:8px 10px; font-size:12.5px; margin-bottom:10px;}
+  .admin-btn{
+    font-family:'Tajawal', sans-serif; font-size:13px; font-weight:700; border-radius:6px; border:1px solid var(--line);
+    background:#fff; color:var(--ink); padding:8px 16px; cursor:pointer;
+  }
+  .admin-btn-primary{background:var(--green); color:var(--paper); border-color:var(--green);}
+  .admin-btn-primary:hover{background:var(--green-deep);}
+  .admin-add-card{border:1px solid var(--line); border-radius:8px; margin-bottom:14px; padding:4px 10px;}
+  .admin-add-card summary{cursor:pointer; padding:8px 2px; font-weight:700; font-size:13.5px; color:var(--green);}
+  .admin-form{display:grid; grid-template-columns:1fr 1fr; gap:8px; padding:6px 2px 10px;}
+  .admin-form label{font-size:11.5px; color:var(--ink-soft); display:block; margin-bottom:2px;}
+  .admin-form .admin-field{display:flex; flex-direction:column;}
+  .admin-field-full{grid-column:1 / -1;}
+  .admin-form textarea{resize:vertical; min-height:56px; font-size:12.5px;}
+  .admin-field-public{flex-direction:row !important; align-items:center; gap:6px;}
+  .admin-item-card{border:1px solid var(--line); border-radius:8px; margin-bottom:10px; background:#fff;}
+  .admin-item-card summary{
+    cursor:pointer; padding:9px 12px; font-size:13px; display:flex; align-items:center;
+    justify-content:space-between; gap:8px;
+  }
+  .admin-item-card summary .admin-item-name{font-weight:700; color:var(--ink);}
+  .admin-item-card summary .admin-item-meta{font-size:11px; color:var(--ink-soft);}
+  .admin-section-title{font-size:14px; color:var(--green); margin:18px 0 4px; border-top:1px solid var(--line); padding-top:14px;}
+  .admin-access-card{border:1px solid var(--line); border-radius:8px; margin-bottom:10px; background:#fff; padding:10px 12px;}
+  .admin-access-card .admin-access-name{font-weight:700; font-size:13.5px; color:var(--ink); margin-bottom:6px;}
+  .admin-access-card .admin-field-public{flex-direction:row !important; align-items:center; gap:6px; margin-bottom:8px;}
+  .admin-access-note{background:var(--paper-deep); border-radius:6px; padding:8px 10px; margin-bottom:10px;}
+  @media (max-width:480px){.admin-form{grid-template-columns:1fr;}}
+
+  /* Admin panel — tabs, allowed-list preview chips, permissions matrix, save bar */
+  .admin-tabs{display:flex; gap:6px; margin-bottom:10px; border-bottom:1px solid var(--line);}
+  .admin-tab-btn{
+    font-family:'Tajawal', sans-serif; font-size:13px; font-weight:700; background:none; border:none;
+    color:var(--ink-soft); padding:8px 10px; cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-1px;
+  }
+  .admin-tab-btn.active{color:var(--green); border-bottom-color:var(--green);}
+  .admin-tab-panel{margin-bottom:8px;}
+  .admin-allowed-preview{margin-top:6px;}
+  .admin-chip{
+    display:inline-block; background:var(--paper-deep); border:1px solid var(--line); border-radius:12px;
+    font-size:11.5px; padding:2px 9px; margin:2px 3px 2px 0;
+  }
+  .admin-link-btn{
+    display:inline-block; margin-top:6px; background:none; border:none; color:var(--green);
+    font-family:'Tajawal', sans-serif; font-size:11.5px; cursor:pointer; padding:0; text-decoration:underline;
+  }
+  .admin-matrix-wrap{overflow-x:auto; border:1px solid var(--line); border-radius:8px; margin-bottom:12px;}
+  table.admin-matrix{border-collapse:collapse; font-size:11.5px; white-space:nowrap;}
+  table.admin-matrix th, table.admin-matrix td{border:1px solid var(--line); padding:5px 7px; text-align:center;}
+  table.admin-matrix th.admin-matrix-head-wrap{white-space:normal; min-width:90px; max-width:130px; line-height:1.35; vertical-align:bottom;}
+  table.admin-matrix thead th{background:var(--paper-deep); color:var(--ink); position:sticky; top:0; z-index:1;}
+  table.admin-matrix td.admin-matrix-sticky, table.admin-matrix th.admin-matrix-sticky{
+    position:sticky; inset-inline-start:0; background:#fff; text-align:right; z-index:2; font-weight:700;
+  }
+  table.admin-matrix th.admin-matrix-sticky{background:var(--paper-deep); z-index:3;}
+  table.admin-matrix td.admin-matrix-email{inset-inline-start:72px; font-weight:400; color:var(--ink-soft); font-size:11px;}
+  table.admin-matrix th.admin-matrix-email{inset-inline-start:72px;}
+  tr.admin-matrix-unknown td.admin-matrix-sticky{color:#9b2c2c; font-style:italic;}
+  .admin-save-bar{
+    position:sticky; bottom:-16px; margin:14px -16px -16px; padding:10px 16px; background:var(--paper);
+    border-top:1px solid var(--line); display:flex; align-items:center; justify-content:flex-end; gap:10px;
+  }
+  .admin-save-bar .admin-error, .admin-save-bar .admin-success{margin:0; flex:1;}
+  #adminSaveAllBtn.admin-dirty{background:var(--gold); border-color:var(--gold); color:var(--ink);}
+
+  @media (max-width:768px){
+    header{height:auto; min-height:56px; padding-top:8px; padding-bottom:8px;}
+    .seal{width:34px; height:34px; font-size:16px;}
+    h1{font-size:17px;}
+    .tagline{display:none;}
+    .header-meta{font-size:10px; text-align:left;}
+    .dashboard-section { padding: 12px 14px 16px !important; margin-bottom: 6px !important; }
+    .dash-topbar { display: flex !important; flex-direction: column !important; align-items: stretch !important; gap: 10px !important; margin-bottom: 12px !important; }
+    .dash-title { margin-bottom: 0 !important; flex: none !important; }
+    .dash-title h2 { font-size: 19px !important; margin: 0 0 2px 0 !important; }
+    .dash-title .dash-sub { margin: 0 !important; font-size: 12.5px !important; }
+    .week-controls { width: 100% !important; margin-top: 2px !important; }
+    .week-picker { width: 100% !important; display: flex !important; align-items: center !important; justify-content: space-between !important; gap: 8px !important; }
+    .week-picker select { flex: 1 !important; min-width: 0 !important; }
+    .summary-banner { grid-template-columns: 1fr !important; gap: 10px !important; margin-bottom: 14px !important; }
+    .summary-pill { padding: 10px 14px; min-height: unset; }
+    .cat-head-row{flex-direction:column; align-items:stretch;}
+    .cat-head-row .view-toggle-group{margin:8px 14px 10px; align-self:flex-start;}
+    .data-table th, .data-table td{padding:9px 10px; font-size:12.5px;}
+    .toolbar{padding:10px 14px 0;}
+    main{padding:10px 14px 6px;}
+    .entry{padding:10px 6px; gap:8px;}
+    .entry-actions{flex-basis:100%; justify-content:space-between;}
+    .stats-tabs{padding:12px 12px 8px; gap:5px;}
+    .stats-tab-btn{padding:6px 11px; font-size:11.5px;}
+    .stats-panel{padding:2px 12px 12px;}
+    .col-filter-panel{max-width:calc(100vw - 48px);}
+  }
+  /* Small phones: hide the counts line but KEEP the signed-in email
+     visible, so people can tell which Google account they're using. */
+  @media (max-width:380px){.header-meta > div:first-child{display:none;}}
+
+  /* Signed-in account line + "switch account" in the header */
+  .switch-account-btn{background:none; border:none; padding:0; color:var(--gold-soft); font-family:inherit; font-size:inherit; font-weight:700; cursor:pointer; text-decoration:underline;}
+  #userEmailMeta{display:inline-block; max-width:42vw; overflow:hidden; text-overflow:ellipsis; vertical-align:bottom; direction:ltr;}
+
+  /* ===================== Sign-in screen ===================== */
+  .auth-gate{
+    position:fixed; inset:0; z-index:300; display:none; align-items:center; justify-content:center;
+    padding:20px; background:var(--paper); overflow-y:auto;
+    background-image:
+      radial-gradient(circle at 100% 0%, rgba(180,135,43,0.08), transparent 45%),
+      radial-gradient(circle at 0% 100%, rgba(31,59,50,0.06), transparent 40%);
+  }
+  .auth-gate.open{display:flex;}
+  .auth-card{
+    width:100%; max-width:380px; margin:auto; background:rgba(255,255,255,0.72); border:1px solid var(--line);
+    border-top:5px solid var(--gold); border-radius:12px; padding:28px 22px 22px; text-align:center;
+    box-shadow:0 10px 30px rgba(42,36,24,0.08);
+  }
+  .auth-seal{margin:0 auto 10px; width:52px; height:52px; font-size:24px; color:var(--gold); border-color:var(--gold); background:none;}
+  .auth-title{font-family:'Amiri', serif; font-size:26px; margin:0; color:var(--green);}
+  .auth-sub{margin:2px 0 18px; color:var(--ink-soft); font-size:13px;}
+  .auth-hint{font-size:14px; margin:0 0 14px; color:var(--ink);}
+  .auth-msg{background:#fee2e2; color:#9b2c2c; border:1px solid #fecaca; border-radius:8px; padding:9px 11px; font-size:13px; margin-bottom:14px; line-height:1.6; text-align:right; overflow-wrap:anywhere;}
+  .auth-gate[data-mode="signin"] .auth-msg{background:#fef3c7; color:#7c4a03; border-color:#fde68a;}
+  .gis-button{display:flex; justify-content:center; min-height:44px; margin-bottom:12px;}
+  .auth-small{font-size:11.5px; color:var(--ink-soft); line-height:1.6; margin:8px 0 0;}
+  .gate-signin, .gate-loading, .gate-error{display:none;}
+  .auth-gate[data-mode="signin"] .gate-signin{display:block;}
+  .auth-gate[data-mode="loading"] .gate-loading{display:flex;}
+  .auth-gate[data-mode="error"] .gate-error{display:flex;}
+  .gate-loading{align-items:center; justify-content:center; gap:10px; color:var(--ink-soft); font-size:14px; padding:10px 0;}
+  .gate-error{justify-content:center; gap:8px; flex-wrap:wrap;}
+  .spinner{width:18px; height:18px; border:2px solid var(--line); border-top-color:var(--green); border-radius:50%; animation:spin .8s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .auth-btn{
+    display:inline-flex; align-items:center; justify-content:center; font-family:'Tajawal', sans-serif;
+    font-size:13.5px; font-weight:700; padding:9px 18px; border-radius:20px; border:1px solid var(--green);
+    background:var(--green); color:var(--paper); cursor:pointer; text-decoration:none;
+  }
+  .auth-btn-light{background:#fff; color:var(--green);}
+  .inapp-hint{background:#fff7ed; border:1px solid #fed7aa; border-radius:8px; padding:12px; text-align:right; font-size:13px; color:#7c2d12; margin:4px 0 6px; line-height:1.6;}
+  .inapp-hint p{margin:6px 0;}
+  .inapp-hint .auth-btn{margin-top:4px;}
+  .copy-row{display:flex; gap:6px; margin-top:8px;}
+  .copy-row input{flex:1; min-width:0; font-family:inherit; font-size:12px; padding:7px 8px; border:1px solid var(--line); border-radius:6px; direction:ltr; background:#fff; color:var(--ink);}
+  .copy-row .auth-btn{padding:7px 12px; font-size:12px; margin-top:0;}
+</style>
+</head>
+<body>
+<!-- Sign-in screen. Covers the page until the person has signed in
+     with Google and their (already permission-filtered) data has
+     arrived from the Apps Script backend. -->
+<div id="authGate" class="auth-gate open" data-mode="loading" role="dialog" aria-modal="true" aria-labelledby="authGateTitle">
+  <div class="auth-card">
+    <div aria-hidden="true" class="seal auth-seal">أ</div>
+    <h2 class="auth-title" id="authGateTitle">السِجل</h2>
+    <p class="auth-sub">فهرس النماذج والسجلات الرقمية</p>
+    <div class="auth-msg" id="authGateMsg" style="display:none;"></div>
+
+    <div class="gate-signin">
+      <p class="auth-hint">سجّل الدخول بحساب Google المسجّل لدى الإدارة.</p>
+      <div class="gis-button" id="gisButton"></div>
+      <div class="inapp-hint" id="inAppHint" style="display:none;">
+        <b>⚠ فتحت الرابط من داخل تطبيق</b>
+        <p>Google لا يسمح بتسجيل الدخول داخل التطبيقات (مثل واتساب). افتح الرابط في Chrome أو Safari:</p>
+        <a class="auth-btn" id="openInChromeBtn" style="display:none;">فتح في Chrome</a>
+        <div class="copy-row">
+          <input id="pageUrlInput" readonly aria-label="رابط الصفحة"/>
+          <button type="button" class="auth-btn auth-btn-light" id="copyUrlBtn">نسخ الرابط</button>
+        </div>
+        <p class="auth-small">على iPhone: اضغط ⋯ أو أيقونة المشاركة ثم «فتح في Safari».</p>
+      </div>
+      <p class="auth-small" id="generalBrowserNote">إن لم يظهر زر الدخول أو ظهرت رسالة خطأ من Google، افتح الرابط في Chrome أو Safari (وليس من داخل واتساب).</p>
+    </div>
+
+    <div class="gate-loading"><span class="spinner" aria-hidden="true"></span> جارٍ التحميل…</div>
+
+    <div class="gate-error">
+      <button type="button" class="auth-btn" id="retryBtn">إعادة المحاولة</button>
+      <button type="button" class="auth-btn auth-btn-light" id="gateSwitchBtn">تبديل الحساب</button>
+    </div>
+  </div>
+</div>
+<div class="wrap">
+<header>
+<div class="header-inner">
+<div class="brand">
+<div aria-hidden="true" class="seal">أ</div>
+<div>
+<h1>السِجل</h1>
+<p class="tagline">فهرس النماذج والسجلات الرقمية</p>
+</div>
+</div>
+<div class="header-meta">
+<div>الأقسام: <b id="metaMain">-</b> · النماذج والسجلات: <b id="metaTotal">-</b></div>
+<div class="header-account"><span id="userEmailMeta"></span> · <button type="button" class="switch-account-btn" id="switchAccountBtn">تبديل الحساب</button></div>
+</div>
+</div>
+</header>
+<!-- Dashboard Section -->
+<section class="dashboard-section" id="dashboardSection" style="display:none">
+<div class="dash-topbar">
+<div class="dash-title">
+<h2>لوحة المتابعة الاسبوعية</h2>
+<p class="dash-sub">احصائيات الحضور الأسبوعي</p>
+</div>
+<div class="week-controls">
+<div class="week-picker">
+<label for="weekSelect">الأسبوع والتاريخ:</label>
+<select aria-label="اختر الأسبوع" id="weekSelect"></select>
+</div>
+</div>
+</div>
+
+<!-- Top Summary KPI Row -->
+<div class="summary-banner" id="summaryBanner"></div>
+
+<!-- Collapsible Attendance Section styled as .category (valid markup: toggle button and view-switcher are siblings, not nested buttons) -->
+<div class="category" id="attendanceCollapseCat">
+<div class="cat-head-row">
+<button aria-expanded="false" class="cat-head" id="attendanceCatHead" type="button">
+<span class="num">
+<svg fill="none" height="18" stroke="currentColor" stroke-width="2" style="display:block;" viewBox="0 0 24 24" width="18"><path d="M3 3h18v18H3zM3 9h18M3 15h18M9 3v18M15 3v18"></path></svg>
+</span>
+<span class="titles">
+<span class="lbl">تفاصيل حضور الفصول الدراسية</span>
+<span class="en">مقارنة أداء ونسب استيعاب الفصول الدراسية</span>
+</span>
+<span class="chev">
+<svg fill="none" height="18" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" viewBox="0 0 24 24" width="18"><path d="M6 9l6 6 6-6"></path></svg>
+</span>
+</button>
+<div class="view-toggle-group">
+<button aria-pressed="false" class="view-toggle-btn" id="tableViewBtn" type="button">
+<svg fill="none" height="13" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="13"><path d="M3 3h18v18H3zM3 9h18M3 15h18M9 3v18M15 3v18"></path></svg>
+عرض الجدول
+</button>
+<button aria-pressed="true" class="view-toggle-btn active" id="cardViewBtn" type="button">
+<svg fill="none" height="13" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="13"><rect height="7" width="7" x="3" y="3"></rect><rect height="7" width="7" x="14" y="3"></rect><rect height="7" width="7" x="14" y="14"></rect><rect height="7" width="7" x="3" y="14"></rect></svg>
+عرض البطاقات
+</button>
+</div>
+</div>
+<div class="cat-body" id="attendanceCatBody">
+<!-- Table View Container -->
+<div class="table-container" id="tableViewContainer" style="display:none;">
+<table class="data-table" id="attendanceTable">
+<thead>
+<tr>
+<th class="cell-idx">م</th>
+<th>الصف / الفصل الدراسي</th>
+<th style="text-align:center;">المسجلين</th>
+<th style="text-align:center;">الحاضرين</th>
+<th style="text-align:center;">الغائبين</th>
+<th style="min-width:180px;">نسبة الحضور</th>
+<th style="text-align:center;">الحالة</th>
+</tr>
+</thead>
+<tbody id="tableBody"></tbody>
+</table>
+</div>
+<!-- Cards Grid Container -->
+<div class="class-grid" id="classGrid" style="display:grid;"></div>
+</div>
+</div>
+</section>
+<!-- Student Stats Section — gated independently of the attendance dashboard above -->
+<section class="dashboard-section" id="studentStatsSection" style="display:none">
+<div class="dash-topbar">
+<div class="dash-title">
+<h2>لوحة المتابعة التراكمية</h2>
+<p class="dash-sub">ترتيب الفصول، الأعلى والأدنى حضوراً، الحضور المثالي، ومتابعة الغياب</p>
+</div>
+</div>
+
+<div class="summary-banner" id="statsSummaryBanner"></div>
+
+<div class="category" id="studentStatsCollapseCat">
+<button aria-expanded="false" class="cat-head" id="studentStatsCatHead" type="button">
+<span class="num">
+<svg fill="none" height="18" stroke="currentColor" stroke-width="2" style="display:block;" viewBox="0 0 24 24" width="18"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+</span>
+<span class="titles">
+<span class="lbl">تفاصيل الطلاب والفصول</span>
+<span class="en">قوائم الطلاب المتفوقين والمحتاجين للمتابعة</span>
+</span>
+<span class="chev">
+<svg fill="none" height="18" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" viewBox="0 0 24 24" width="18"><path d="M6 9l6 6 6-6"></path></svg>
+</span>
+</button>
+<div class="cat-body" id="studentStatsCatBody">
+<div class="stats-tabs" id="statsTabs">
+<button class="stats-tab-btn active" data-panel="classRank" type="button">ترتيب الفصول</button>
+<button class="stats-tab-btn" data-panel="top" type="button">الأعلى حضوراً</button>
+<button class="stats-tab-btn" data-panel="lowest" type="button">الأعلى غياباً</button>
+<button class="stats-tab-btn" data-panel="perfect" type="button">الحضور المثالي</button>
+<button class="stats-tab-btn" data-panel="followup" type="button">بحاجة إلى متابعة</button>
+<button class="stats-tab-btn" data-panel="detail" type="button">بالتفصيل</button>
+</div>
+<div class="stats-panel" id="statsPanel-classRank"></div>
+<div class="stats-panel" id="statsPanel-top" style="display:none;"></div>
+<div class="stats-panel" id="statsPanel-lowest" style="display:none;"></div>
+<div class="stats-panel" id="statsPanel-perfect" style="display:none;"></div>
+<div class="stats-panel" id="statsPanel-followup" style="display:none;"></div>
+<div class="stats-panel" id="statsPanel-detail" style="display:none;"></div>
+</div>
+</div>
+</section>
+<!-- Directory Section — the whole thing is now one more foldable
+     section (like the dashboards above), styled as .category, with
+     the existing per-subject categories still individually foldable
+     inside it. -->
+<div class="category" id="formsCollapseCat">
+<button aria-expanded="false" class="cat-head" id="formsCatHead" type="button">
+<span class="num">
+<svg fill="none" height="18" stroke="currentColor" stroke-width="2" style="display:block;" viewBox="0 0 24 24" width="18"><path d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h6M9 9h2"/></svg>
+</span>
+<span class="titles">
+<span class="lbl">النماذج وجداول البيانات</span>
+<span class="en" id="formsCatSub">دليل النماذج وجداول البيانات لكل قسم</span>
+</span>
+<span class="count" id="formsCatCount">-</span>
+<span class="chev">
+<svg fill="none" height="18" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" viewBox="0 0 24 24" width="18"><path d="M6 9l6 6 6-6"></path></svg>
+</span>
+</button>
+<div class="cat-body" id="formsCatBody">
+<div class="toolbar" id="toolbar" style="justify-content:flex-end;">
+<button class="toggle-all" id="toggleAllBtn" type="button">توسيع الكل</button>
+</div>
+<!-- Categories & Links List -->
+<main id="pages"></main>
+</div>
+</div>
+<footer>دليل داخلي لتنظيم النماذج والسجلات<br/><button type="button" id="adminPanelTrigger">⚙ لوحة التحكم</button></footer>
+</div>
+
+<!-- Admin control panel: add/update catalog items & their allowed
+     emails, gated by a shared PIN (checked again server-side on every
+     save — see ITEMS_ADMIN_PIN in Code.gs). The trigger link above is
+     always visible to any visitor, in the normal page flow (not
+     position:fixed, which some mobile browsers render unreliably); it
+     just opens a PIN prompt, nothing readable until the right PIN is
+     entered. -->
+<div id="adminPanelOverlay" class="admin-overlay">
+  <div class="admin-modal">
+    <div class="admin-modal-head">
+      <h3 id="adminModalTitle">لوحة التحكم</h3>
+      <button type="button" id="adminModalClose" aria-label="إغلاق">✕</button>
+    </div>
+    <div class="admin-modal-body">
+
+      <div id="adminPinScreen">
+        <p class="admin-hint">أدخل رمز الدخول لإدارة الأصناف.</p>
+        <input type="password" id="adminPinInput" class="admin-pin-input" placeholder="رمز الدخول" inputmode="numeric" autocomplete="off"/>
+        <div id="adminPinError" class="admin-error" style="display:none;"></div>
+        <button type="button" id="adminPinSubmit" class="admin-btn admin-btn-primary">دخول</button>
+      </div>
+
+      <div id="adminItemsScreen" style="display:none;">
+        <div class="admin-tabs">
+          <button type="button" class="admin-tab-btn active" data-admin-tab="items">الأصناف</button>
+          <button type="button" class="admin-tab-btn" data-admin-tab="access">الصلاحيات</button>
+        </div>
+        <div id="adminItemsMsg" class="admin-error" style="display:none;"></div>
+
+        <div id="adminTabItems" class="admin-tab-panel">
+          <details class="admin-add-card" id="adminAddCard">
+            <summary>➕ إضافة صنف جديد</summary>
+            <div class="admin-form" id="adminAddForm" data-mode="new"></div>
+          </details>
+
+          <div class="admin-items-list" id="adminItemsList"></div>
+        </div>
+
+        <div id="adminTabAccess" class="admin-tab-panel" style="display:none;">
+          <div id="adminAccessRules"></div>
+
+          <h4 class="admin-section-title">مصفوفة الصلاحيات (من يرى ماذا)</h4>
+          <p class="admin-hint">الصفوف تأتي من تبويب "Contacts" في الجدول الرئيسي (Main) — العمودان J (الاسم) وK (البريد). أضف هناك كل من تريد إدارة صلاحياته هنا، ثم فعّل الخانة المناسبة لكل صنف أو قسم. مرّر يمين/يسار لرؤية كل الأعمدة.</p>
+          <div class="admin-matrix-wrap">
+            <table class="admin-matrix" id="adminMatrixTable"></table>
+          </div>
+        </div>
+
+        <div class="admin-save-bar">
+          <div id="adminSaveMsg" class="admin-error" style="display:none;"></div>
+          <button type="button" id="adminSaveAllBtn" class="admin-btn admin-btn-primary">💾 حفظ كل التغييرات</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// SETTINGS — the only two lines you need to edit in this file.
+// ============================================================
+// 1) Your Apps Script web app URL (Deploy > Manage deployments).
+//    It starts with https://script.google.com/macros/s/ and ends with /exec
+const API_URL = "PASTE_YOUR_APPS_SCRIPT_WEB_APP_URL";
+// 2) Your Google Client ID — the SAME value as GOOGLE_CLIENT_ID in Code.gs.
+const GOOGLE_CLIENT_ID = "8092315377-4rcjdeijk3l1li0r8muq1jh1187b20oh.apps.googleusercontent.com";
+// ============================================================
+
+// Filled in after sign-in by the "getPageData" call. The backend only
+// ever sends what this signed-in email is allowed to see — items,
+// dashboards and contact numbers it isn't allowed are dropped on the
+// server and never reach this browser at all.
+let SERVER_DATA = null;
+
+// ---------- Google sign-in ----------
+// The ID token Google gives us after sign-in. It's sent with every
+// request so the backend can confirm who is asking. Kept only in
+// sessionStorage (cleared when the tab/browser closes); it expires on
+// its own after about an hour, and the page asks to sign in again.
+const TOKEN_STORE_KEY = 'sijil_id_token';
+let idToken = null;
+let gisReady = false;
+let gisFailed = false;
+let signInWaiters = [];
+
+function readStoredToken(){ try { return sessionStorage.getItem(TOKEN_STORE_KEY); } catch(e){ return null; } }
+function storeToken(t){ try { if (t) sessionStorage.setItem(TOKEN_STORE_KEY, t); else sessionStorage.removeItem(TOKEN_STORE_KEY); } catch(e){} }
+
+// Reads the token's expiry time locally. This is NOT a security check
+// (the backend does the real one) — it just avoids sending a token we
+// already know has expired.
+function decodeJwtPayload(token){
+  try {
+    const part = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+    const padded = part + '='.repeat((4 - part.length % 4) % 4);
+    const bytes = Uint8Array.from(atob(padded), c => c.charCodeAt(0));
+    return JSON.parse(new TextDecoder().decode(bytes));
+  } catch(e){ return null; }
+}
+function tokenIsFresh(token){
+  const p = token && decodeJwtPayload(token);
+  return !!(p && p.exp && p.exp * 1000 > Date.now() + 2 * 60 * 1000);
+}
+
+function configIsSet(){
+  return /^https:\/\/script\.google\.com\//.test(API_URL) && !/^PASTE_/.test(GOOGLE_CLIENT_ID);
+}
+
+// ---------- Sign-in screen ----------
+function gateEl(){ return document.getElementById('authGate'); }
+function showGate(mode, message){ // mode: 'signin' | 'loading' | 'error'
+  const g = gateEl();
+  const msgEl = document.getElementById('authGateMsg');
+  g.dataset.mode = mode;
+  g.classList.add('open');
+  msgEl.textContent = message || '';
+  msgEl.style.display = message ? '' : 'none';
+  if (mode === 'signin') renderGisButton();
+}
+function hideGate(){ gateEl().classList.remove('open'); }
+
+function renderGisButton(){
+  if (gisFailed){
+    const msgEl = document.getElementById('authGateMsg');
+    msgEl.textContent = 'تعذّر تحميل زر تسجيل الدخول من Google. تحقّق من الاتصال، أو افتح الرابط في Chrome أو Safari، ثم أعد تحميل الصفحة.';
+    msgEl.style.display = '';
+    return;
+  }
+  if (!gisReady) return; // onGisLoaded() will call this again once ready
+  const el = document.getElementById('gisButton');
+  el.innerHTML = '';
+  google.accounts.id.renderButton(el, {
+    type: 'standard', theme: 'filled_blue', size: 'large', text: 'signin_with',
+    shape: 'pill', locale: 'ar', width: 260
+  });
+  try { google.accounts.id.prompt(); } catch(e){}
+}
+
+// Called by the Google sign-in library's <script onload> at the bottom.
+function onGisLoaded(){
+  if (!configIsSet()) return;
+  google.accounts.id.initialize({
+    client_id: GOOGLE_CLIENT_ID,
+    callback: handleCredential,
+    auto_select: true,          // returning users are signed in without tapping
+    itp_support: true,
+    cancel_on_tap_outside: false
+  });
+  gisReady = true;
+  if (gateEl().classList.contains('open') && gateEl().dataset.mode === 'signin') renderGisButton();
+}
+function onGisFailed(){
+  gisFailed = true;
+  if (gateEl().dataset.mode === 'signin') renderGisButton();
+}
+
+function handleCredential(response){
+  if (!response || !response.credential) return;
+  idToken = response.credential;
+  storeToken(idToken);
+  if (SERVER_DATA) hideGate();      // re-sign-in while using the page
+  else showGate('loading');         // first sign-in: data is loading next
+  const waiters = signInWaiters;
+  signInWaiters = [];
+  waiters.forEach(resolve => resolve());
+}
+
+function requireSignIn(message){
+  return new Promise(resolve => {
+    signInWaiters.push(resolve);
+    showGate('signin', message);
+  });
+}
+
+function switchAccount(){
+  storeToken(null);
+  try { if (window.google && google.accounts && google.accounts.id) google.accounts.id.disableAutoSelect(); } catch(e){}
+  location.reload();
+}
+
+// Links opened from inside WhatsApp, Instagram, etc. load in that
+// app's own mini-browser, where Google blocks sign-in. Spot the common
+// ones and show how to reopen the page in a real browser.
+function setupInAppBrowserHint(){
+  const ua = navigator.userAgent || '';
+  const inApp = /FBAN|FBAV|FB_IAB|Instagram|Line\/|Snapchat|WhatsApp|Telegram|TikTok|musical_ly|MicroMessenger|; wv\)/i.test(ua);
+  if (!inApp) return;
+  document.getElementById('inAppHint').style.display = '';
+  document.getElementById('generalBrowserNote').style.display = 'none';
+  const urlInput = document.getElementById('pageUrlInput');
+  urlInput.value = location.href;
+  if (/Android/i.test(ua)){
+    const chromeBtn = document.getElementById('openInChromeBtn');
+    chromeBtn.href = 'intent://' + location.host + location.pathname + location.search +
+      '#Intent;scheme=https;package=com.android.chrome;end';
+    chromeBtn.style.display = '';
+  }
+  document.getElementById('copyUrlBtn').addEventListener('click', () => {
+    const btn = document.getElementById('copyUrlBtn');
+    const done = () => { btn.textContent = 'تم النسخ ✓'; };
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(location.href).then(done, () => { urlInput.select(); });
+    } else {
+      urlInput.select();
+      try { if (document.execCommand('copy')) done(); } catch(e){}
+    }
+  });
+}
+
+// ---------- Talking to the Apps Script backend ----------
+// Sent as text/plain on purpose: it's the only way a browser can POST
+// to Apps Script from another site without a "preflight" request that
+// Apps Script can't answer.
+async function postApi(action, args){
+  let r;
+  try {
+    r = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action: action, args: args || [], idToken: idToken })
+    });
+  } catch(e){
+    throw new Error('تعذّر الاتصال بالخادم. تحقّق من الإنترنت ثم حاول مرة أخرى.');
+  }
+  const text = await r.text();
+  try { return JSON.parse(text); }
+  catch(e){
+    throw new Error('استجابة غير متوقعة من الخادم. تأكد من رابط Apps Script وأن النشر مضبوط على: Execute as: Me و Who has access: Anyone.');
+  }
+}
+
+async function callApi(action, args){
+  if (!idToken || !tokenIsFresh(idToken)){
+    idToken = null; storeToken(null);
+    await requireSignIn(SERVER_DATA ? 'انتهت الجلسة. سجّل الدخول مرة أخرى للمتابعة.' : '');
+  }
+  let res = await postApi(action, args);
+  if (!res.ok && res.code === 'AUTH'){
+    idToken = null; storeToken(null);
+    await requireSignIn('انتهت الجلسة. سجّل الدخول مرة أخرى للمتابعة.');
+    res = await postApi(action, args);
+  }
+  if (!res.ok){
+    throw new Error((res.error || 'حدث خطأ غير معروف.') + (res.detail ? ' (' + res.detail + ')' : ''));
+  }
+  return res.result;
+}
+
+// Drop-in replacement for google.script.run, so the rest of this page
+// keeps the same style of calls:
+//   serverRun.withSuccessHandler(fn).withFailureHandler(fn).someAction(arg1, arg2)
+function makeServerRunner(onSuccess, onFailure){
+  return new Proxy({}, {
+    get(_, name){
+      if (name === 'withSuccessHandler') return fn => makeServerRunner(fn, onFailure);
+      if (name === 'withFailureHandler') return fn => makeServerRunner(onSuccess, fn);
+      if (typeof name !== 'string' || name === 'then') return undefined;
+      return (...args) => {
+        callApi(name, args).then(
+          result => { if (onSuccess) onSuccess(result); },
+          err => { if (onFailure) onFailure(err); else console.error(err); }
+        );
+      };
+    }
+  });
+}
+const serverRun = makeServerRunner(null, null);
+
+// ---------- Start-up ----------
+async function boot(){
+  document.getElementById('retryBtn').addEventListener('click', () => location.reload());
+  document.getElementById('gateSwitchBtn').addEventListener('click', switchAccount);
+  document.getElementById('switchAccountBtn').addEventListener('click', switchAccount);
+  setupInAppBrowserHint();
+
+  if (!configIsSet()){
+    showGate('error', 'لم يكتمل الإعداد: ضع رابط Apps Script ومعرّف Google (Client ID) في أعلى ملف index.html.');
+    return;
+  }
+
+  idToken = readStoredToken();
+  if (!idToken || !tokenIsFresh(idToken)){
+    idToken = null; storeToken(null);
+    await requireSignIn();
+  }
+  showGate('loading');
+
+  try {
+    const res = await callApi('getPageData', []);
+    SERVER_DATA = res.data;
+    document.getElementById('userEmailMeta').textContent = res.email;
+    startApp();
+    hideGate();
+  } catch(err){
+    showGate('error', String((err && err.message) || err));
+  }
+}
+</script>
+<script>
+const AR_DIGITS = ["٠","١","٢","٣","٤","٥","٦","٧","٨","٩"];
+function toArabicNum(n){
+  if(n === null || n === undefined || isNaN(n)) return "—";
+  return String(n).split("").map(d => d === "." ? "," : (AR_DIGITS[+d] ?? d)).join("");
+}
+
+const ICONS = {
+  form: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h6M9 9h2"/></svg>`,
+  spreadsheet: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="1"/><path d="M3 9h18M3 15h18M9 4v16M15 4v16"/></svg>`
+};
+const TYPE_LABEL = { form: "نموذج", spreadsheet: "جدول بيانات" };
+const ARROW = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>`;
+const CHEV = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>`;
+
+// Render Directory Categories
+function buildList(categories){
+  const pagesEl = document.getElementById("pages");
+  pagesEl.innerHTML = "";
+  let totalItems = 0;
+  categories.forEach((cat, i) => {
+    totalItems += cat.items.length;
+
+    // A category the signed-in user's permissions reduced to a single
+    // visible item gains nothing from being wrapped in its own foldable
+    // accordion — show that one item directly, with no click needed.
+    if (cat.items.length === 1) {
+      const item = cat.items[0];
+      const flatEl = document.createElement("div");
+      flatEl.className = "category single-item";
+      flatEl.innerHTML = `
+        <div class="cat-head cat-head-static">
+          <span class="num">${toArabicNum(i + 1)}</span>
+          <span class="titles">
+            <span class="lbl">${item.name}</span>
+            <span class="en">${cat.main}</span>
+          </span>
+          <span class="entry-actions">
+            <span class="badge ${item.type}">${ICONS[item.type]}${TYPE_LABEL[item.type]}</span>
+            <a class="open-btn" href="${item.link}" target="_blank" rel="noopener noreferrer">فتح ${ARROW}</a>
+          </span>
+        </div>`;
+      pagesEl.appendChild(flatEl);
+      return;
+    }
+
+    const catEl = document.createElement("div");
+    catEl.className = "category";
+    const entries = cat.items.map((item, j) => `
+      <li class="entry">
+        <span class="entry-main">
+          <span class="idx">${toArabicNum(j + 1)}</span>
+          <span class="name">${item.name}</span>
+        </span>
+        <span class="entry-actions">
+          <span class="badge ${item.type}">${ICONS[item.type]}${TYPE_LABEL[item.type]}</span>
+          <a class="open-btn" href="${item.link}" target="_blank" rel="noopener noreferrer">فتح ${ARROW}</a>
+        </span>
+      </li>`).join("");
+    catEl.innerHTML = `
+      <button class="cat-head" type="button" aria-expanded="false">
+        <span class="num">${toArabicNum(i + 1)}</span>
+        <span class="titles">
+          <span class="lbl">${cat.main}</span>
+          <span class="en">${cat.en}</span>
+        </span>
+        <span class="count">${toArabicNum(cat.items.length)}</span>
+        <span class="chev">${CHEV}</span>
+      </button>
+      <div class="cat-body"><ul class="entries">${entries}</ul></div>`;
+    catEl.querySelector(".cat-head").addEventListener("click", () => {
+      const willOpen = !catEl.classList.contains("open");
+      catEl.classList.toggle("open", willOpen);
+      catEl.querySelector(".cat-head").setAttribute("aria-expanded", String(willOpen));
+      updateToggleAllLabel();
+    });
+    pagesEl.appendChild(catEl);
+  });
+  document.getElementById("metaMain").textContent = toArabicNum(categories.length);
+  document.getElementById("metaTotal").textContent = toArabicNum(totalItems);
+  document.getElementById("formsCatCount").textContent = toArabicNum(totalItems);
+}
+
+// Outer "النماذج وجداول البيانات" accordion — folds the whole directory
+// section, independently of the individual subject categories inside it.
+// But when the signed-in user has no access to any of the three
+// standalone dashboard/contact-action rules, this directory is the only
+// section left on the page, so there is nothing to gain from making
+// them click to open it — it opens itself and stays non-foldable.
+// (Called from startApp(), once the signed-in user's data has arrived.)
+function setupFormsAccordion(){
+  const cat = document.getElementById('formsCollapseCat');
+  const head = document.getElementById('formsCatHead');
+  const isOnlySectionOnPage = !SERVER_DATA.attendanceDashboard && !SERVER_DATA.studentStats;
+  if (isOnlySectionOnPage) {
+    cat.classList.add('open');
+    head.setAttribute('aria-expanded', 'true');
+    head.classList.add('cat-head-static');
+    return;
+  }
+  head.addEventListener('click', () => {
+    const isOpen = cat.classList.contains('open');
+    cat.classList.toggle('open', !isOpen);
+    head.setAttribute('aria-expanded', String(!isOpen));
+  });
+}
+
+const toggleAllBtn = document.getElementById("toggleAllBtn");
+function updateToggleAllLabel(){
+  const cats = document.querySelectorAll("#pages .category:not(.single-item)");
+  const allOpen = cats.length > 0 && Array.from(cats).every(c => c.classList.contains("open"));
+  toggleAllBtn.textContent = allOpen ? "طي الكل" : "توسيع الكل";
+}
+
+toggleAllBtn.addEventListener("click", () => {
+  const cats = document.querySelectorAll("#pages .category:not(.single-item)");
+  const allOpen = Array.from(cats).every(c => c.classList.contains("open"));
+  cats.forEach(c => {
+    c.classList.toggle("open", !allOpen);
+    c.querySelector(".cat-head").setAttribute("aria-expanded", String(!allOpen));
+  });
+  updateToggleAllLabel();
+});
+
+// Enhanced Attendance Dashboard with Accordion and View Switcher
+function toArabicDigits(str) {
+  const map = {'0':'٠','1':'١','2':'٢','3':'٣','4':'٤','5':'٥','6':'٦','7':'٧','8':'٨','9':'٩'};
+  return String(str).replace(/[0-9]/g, d => map[d]);
+}
+
+// Shared between the attendance dashboard and the student-stats section.
+function getStageBadge(code){
+  const num = parseInt(code, 10);
+  if(num <= 6) return `<span class="stage-badge stage-elem">ابتدائي</span>`;
+  if(num <= 8) return `<span class="stage-badge stage-mid">متوسط</span>`;
+  return `<span class="stage-badge stage-high">ثانوي</span>`;
+}
+
+function setupAttendanceDashboard(dash){
+  const { classInfo, classOrder, registered, totalRegistered, weeks, defaultWeekId } = dash;
+  const WEEK_ORDINALS = [
+    "الأول","الثاني","الثالث","الرابع","الخامس","السادس","السابع","الثامن","التاسع","العاشر",
+    "الحادي عشر","الثاني عشر","الثالث عشر","الرابع عشر","الخامس عشر","السادس عشر","السابع عشر","الثامن عشر","التاسع عشر","العشرون",
+    "الحادي والعشرون","الثاني والعشرون","الثالث والعشرون","الرابع والعشرون","الخامس والعشرون"
+  ];
+
+  function formatWeekLabel(w){
+    const ordinal = WEEK_ORDINALS[w.id - 1] || ('رقم ' + w.id);
+    const m = /^\(\d+\)\s*-\s*(.+)$/.exec(w.label);
+    const rest = m ? m[1] : w.label;
+    return `الأسبوع ${ordinal} - ${toArabicDigits(rest)}`;
+  }
+
+  const WARN_ICON = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/></svg>`;
+
+  // Populate Week Selector
+  const weekSelect = document.getElementById('weekSelect');
+  weekSelect.innerHTML = '';
+  weeks.forEach(w => {
+    const opt = document.createElement('option');
+    opt.value = w.id;
+    opt.textContent = w.data ? formatWeekLabel(w) : formatWeekLabel(w) + ' — 🔄';
+    weekSelect.appendChild(opt);
+  });
+
+  const configuredWeek = weeks.find(w => w.id == defaultWeekId);
+  const lastWithData = [...weeks].reverse().find(w => w.data) || weeks[0];
+  weekSelect.value = (configuredWeek || lastWithData).id;
+
+  // Accordion Toggle Logic for Attendance Section
+  const attCat = document.getElementById('attendanceCollapseCat');
+  const attHead = document.getElementById('attendanceCatHead');
+  attHead.addEventListener('click', () => {
+    const isOpen = attCat.classList.contains('open');
+    attCat.classList.toggle('open', !isOpen);
+    attHead.setAttribute('aria-expanded', String(!isOpen));
+  });
+
+  // View Switcher logic
+  const tableViewBtn = document.getElementById('tableViewBtn');
+  const cardViewBtn = document.getElementById('cardViewBtn');
+  const tableViewContainer = document.getElementById('tableViewContainer');
+  const classGrid = document.getElementById('classGrid');
+
+  function setView(view){
+    if(view === 'table'){
+      tableViewBtn.classList.add('active');
+      tableViewBtn.setAttribute('aria-pressed', 'true');
+      cardViewBtn.classList.remove('active');
+      cardViewBtn.setAttribute('aria-pressed', 'false');
+      tableViewContainer.style.display = 'block';
+      classGrid.style.display = 'none';
+    } else {
+      cardViewBtn.classList.add('active');
+      cardViewBtn.setAttribute('aria-pressed', 'true');
+      tableViewBtn.classList.remove('active');
+      tableViewBtn.setAttribute('aria-pressed', 'false');
+      tableViewContainer.style.display = 'none';
+      classGrid.style.display = 'grid';
+    }
+  }
+
+  tableViewBtn.addEventListener('click', () => setView('table'));
+  cardViewBtn.addEventListener('click', () => setView('card'));
+  setView('card'); // default to card view instead of table
+
+  function renderDashboard(){
+    const week = weeks.find(w => w.id == weekSelect.value);
+    const summaryBanner = document.getElementById('summaryBanner');
+    const tableBody = document.getElementById('tableBody');
+    const grid = document.getElementById('classGrid');
+
+    // Per-week overall % and top class — computed only from the classes
+    // actually recorded for the SELECTED week (registered denominator
+    // limited to those classes too, so a partial week isn't skewed by
+    // classes that haven't reported yet). null/-1 means no class at all
+    // has data for this week.
+    const recordedCodesForWeek = (week && week.data)
+      ? classOrder.filter(code => week.data[code] !== null && week.data[code] !== undefined)
+      : [];
+    let weekOverallPct = null;
+    let weekTopClassCode = null;
+    let weekTopRate = -1;
+    if (recordedCodesForWeek.length > 0) {
+      const sumAttended = recordedCodesForWeek.reduce((s, code) => s + week.data[code], 0);
+      const sumRegistered = recordedCodesForWeek.reduce((s, code) => s + (registered[code] || 0), 0);
+      weekOverallPct = sumRegistered > 0 ? (sumAttended / sumRegistered) * 100 : 0;
+      recordedCodesForWeek.forEach(code => {
+        const v = week.data[code];
+        const cap = registered[code] || 1;
+        const rate = (v / cap) * 100;
+        if (rate > weekTopRate) {
+          weekTopRate = rate;
+          weekTopClassCode = code;
+        }
+      });
+    }
+
+    // "نسبة الحضور العامة" trend tag — compares the selected week's
+    // overall % against the week immediately before it in the weeks
+    // list (same "only classes that actually reported" denominator
+    // logic as weekOverallPct above), not against the all-time
+    // average. Neutral (grey clock icon) when either week has no
+    // recorded data at all, or the two rates are exactly equal.
+    const weekIdx = weeks.findIndex(w => w.id === week.id);
+    const prevWeek = weekIdx > 0 ? weeks[weekIdx - 1] : null;
+    let prevWeekOverallPct = null;
+    if (prevWeek && prevWeek.data) {
+      const prevRecordedCodes = classOrder.filter(code => prevWeek.data[code] !== null && prevWeek.data[code] !== undefined);
+      if (prevRecordedCodes.length > 0) {
+        const prevSumAttended = prevRecordedCodes.reduce((s, code) => s + prevWeek.data[code], 0);
+        const prevSumRegistered = prevRecordedCodes.reduce((s, code) => s + (registered[code] || 0), 0);
+        prevWeekOverallPct = prevSumRegistered > 0 ? (prevSumAttended / prevSumRegistered) * 100 : 0;
+      }
+    }
+
+    let trendIconHtml, trendIconBg, trendIconBorder, trendIconColor;
+    if (weekOverallPct !== null && prevWeekOverallPct !== null && weekOverallPct > prevWeekOverallPct) {
+      trendIconColor = '#15803d';
+      trendIconBg = 'rgba(21,128,61,0.12)';
+      trendIconBorder = 'rgba(21,128,61,0.35)';
+      trendIconHtml = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg>`;
+    } else if (weekOverallPct !== null && prevWeekOverallPct !== null && weekOverallPct < prevWeekOverallPct) {
+      trendIconColor = '#b91c1c';
+      trendIconBg = '#fee2e2';
+      trendIconBorder = '#fecaca';
+      trendIconHtml = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M19 12l-7 7-7-7"/></svg>`;
+    } else {
+      trendIconColor = 'var(--green)';
+      trendIconBg = 'var(--paper-deep)';
+      trendIconBorder = 'var(--line)';
+      trendIconHtml = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`;
+    }
+
+    const weekPctPillHtml = `
+      <div class="summary-pill">
+        <div>
+          <div class="pill-label">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"/></svg>
+            نسبة الحضور
+          </div>
+          <div class="pill-num">${weekOverallPct === null ? '—' : toArabicNum(weekOverallPct.toFixed(1)) + '%'}</div>
+          <div class="pill-sub">${weekOverallPct === null ? 'لا توجد بيانات لهذا الأسبوع' : formatWeekLabel(week)}</div>
+        </div>
+        <div class="pill-icon" style="background:${trendIconBg}; border-color:${trendIconBorder}; color:${trendIconColor};">
+          ${trendIconHtml}
+        </div>
+      </div>`;
+
+    const topClassPillHtml = `
+      <div class="summary-pill highlight">
+        <div>
+          <div class="pill-label">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            الأعلى حضوراً هذا الاسبوع
+          </div>
+          <div class="pill-num" style="color:var(--gold-soft); font-size:18px; line-height:1.3; margin-top:4px;">${weekTopClassCode ? classInfo[weekTopClassCode] : '—'}</div>
+          <div class="pill-sub">${weekTopClassCode ? (toArabicNum(weekTopRate.toFixed(1)) + '%') : 'لا توجد بيانات لهذا الأسبوع'}</div>
+        </div>
+        <div class="pill-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+        </div>
+      </div>`;
+
+    if(!week || !week.data){
+      // Fully unrecorded week (0/8 classes) — both pills show "no data".
+      summaryBanner.innerHTML = `
+        <div class="summary-pill highlight" style="grid-column: span 2; justify-content:center; text-align:center; padding:18px;">
+          <div>
+            <div class="pill-label" style="justify-content:center; font-size:15px; margin-bottom:4px;">${formatWeekLabel(week)}</div>
+            <div class="pill-sub" style="font-size:13.5px;">لم تُسجّل بيانات الحضور لهذا الأسبوع بعد. يُرجى اختيار أسبوع آخر لعرض إحصائيات هذا الأسبوع تحديداً.</div>
+          </div>
+        </div>
+        ${weekPctPillHtml}
+        ${topClassPillHtml}
+      `;
+
+      tableBody.innerHTML = `
+        <tr>
+          <td colspan="7" style="text-align:center; padding:28px; color:var(--ink-soft);">
+            لم تُسجّل بيانات حضور الفصول لهذا الأسبوع بعد.
+          </td>
+        </tr>`;
+
+      grid.innerHTML = `
+        <div class="empty-state-card" style="grid-column:1/-1;">
+          لم تُسجّل بيانات حضور الفصول لهذا الأسبوع بعد.
+        </div>`;
+      return;
+    }
+
+    // Which classes actually have a value this week — drives the
+    // full/partial split below (weekTopClassCode/weekTopRate for the ★
+    // badge were already computed above from the same recorded classes).
+    const recordedCodes = recordedCodesForWeek;
+    const isFullyRecorded = recordedCodes.length === classOrder.length;
+
+    let totalsPillsHtml;
+
+    if (isFullyRecorded) {
+      // All 8 classes reported — the registered denominator is trustworthy,
+      // so show the normal "إجمالي الحضور"/"إجمالي الغياب" pills.
+      const totalAttended = week.total;
+      const totalAbsent = Math.max(0, totalRegistered - totalAttended);
+      const overallPct = week.pct || Math.round((totalAttended / totalRegistered) * 1000) / 10;
+
+      totalsPillsHtml = `
+      <div class="summary-pill">
+        <div>
+          <div class="pill-label">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg>
+            إجمالي الحضور
+          </div>
+          <div class="pill-num">${toArabicNum(totalAttended)} <span style="font-size:12px; font-weight:normal; font-family:'Tajawal'; color:var(--ink-soft);">طالباً</span></div>
+          <div class="pill-sub">من أصل ${toArabicNum(totalRegistered)} مسجّل</div>
+        </div>
+        <div class="pill-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg>
+        </div>
+      </div>
+
+      <div class="summary-pill">
+        <div>
+          <div class="pill-label">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+            إجمالي الغياب
+          </div>
+          <div class="pill-num" style="color:#a83232;">${toArabicNum(totalAbsent)} <span style="font-size:12px; font-weight:normal; font-family:'Tajawal'; color:var(--ink-soft);">طالباً</span></div>
+          <div class="pill-sub">نسبة الغياب: ${toArabicNum((100 - overallPct).toFixed(1))}%</div>
+        </div>
+        <div class="pill-icon" style="background:#fee2e2; border-color:#fecaca; color:#b91c1c;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </div>
+      </div>`;
+    } else {
+      // 1–7 of 8 recorded — same compact single-block layout as the fully
+      // unrecorded state (centered, no side icon column), just with a
+      // different message, so the banner's size/shape stays consistent
+      // across every state instead of growing for a badge grid.
+      const missingNames = classOrder
+        .filter(code => week.data[code] === null || week.data[code] === undefined)
+        .map(code => classInfo[code]);
+      totalsPillsHtml = `
+        <div class="summary-pill highlight" style="grid-column: span 2; justify-content:center; text-align:center; padding:18px;">
+          <div>
+            <div class="pill-label" style="justify-content:center; font-size:15px; margin-bottom:4px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/></svg>
+              حالة تسجيل الفصول لهذا الأسبوع (${toArabicNum(recordedCodes.length)}/${toArabicNum(classOrder.length)})
+            </div>
+            <div class="pill-sub" style="font-size:13.5px;">
+              لم يُسجَّل بعد: ${missingNames.join('، ')}
+            </div>
+          </div>
+        </div>`;
+    }
+
+    summaryBanner.innerHTML = `
+      ${totalsPillsHtml}
+      ${weekPctPillHtml}
+      ${topClassPillHtml}
+    `;
+
+    // Render Compact Table Body
+    tableBody.innerHTML = classOrder.map((code, idx) => {
+      const rawVal = week.data[code];
+      const isUnrecorded = (rawVal === null || rawVal === undefined);
+      const attended = isUnrecorded ? 0 : rawVal;
+      const cap = registered[code] || 1;
+      const absent = Math.max(0, cap - attended);
+      const pct = Math.round((attended / cap) * 100);
+      const isTop = !isUnrecorded && code === weekTopClassCode;
+
+      let statusMarkup = '';
+      if(isUnrecorded){
+        statusMarkup = `<span class="status-tag unrecorded">${WARN_ICON} غير مُسجَّل</span>`;
+      } else if(pct >= 95){
+        statusMarkup = `<span class="status-tag excellent">ممتاز</span>`;
+      } else if(pct >= 88){
+        statusMarkup = `<span class="status-tag vgood">جيد جداً</span>`;
+      } else {
+        statusMarkup = `<span class="status-tag attention">يحتاج متابعة</span>`;
+      }
+
+      return `
+        <tr class="${isUnrecorded ? 'unrecorded-row' : ''}" ${isTop ? 'style="background:rgba(180,135,43,0.06);"' : ''}>
+          <td class="cell-idx">${toArabicNum(idx + 1)}</td>
+          <td class="cell-class">
+            ${classInfo[code]}
+            ${isTop ? '<span style="color:var(--gold); margin-inline-start:4px; font-size:12px; font-weight:bold;">★ الأعلى</span>' : ''}
+          </td>
+          <td style="text-align:center; font-weight:600;">${toArabicNum(cap)}</td>
+          <td style="text-align:center; font-weight:700; color:${isUnrecorded ? '#9a3412' : 'var(--green)'};">${isUnrecorded ? '—' : toArabicNum(attended)}</td>
+          <td style="text-align:center; font-weight:600; color:${isUnrecorded ? '#9a3412' : (absent > 3 ? '#9b2c2c' : 'var(--ink-soft)')};">${isUnrecorded ? '—' : toArabicNum(absent)}</td>
+          <td>
+            ${isUnrecorded
+              ? `<span class="unrecorded-note">${WARN_ICON} لم تُدخل بيانات هذا الفصل بعد</span>`
+              : `<div class="prog-wrapper">
+                  <div class="prog-track">
+                    <div class="prog-bar" style="width:${pct}%; ${isTop ? 'background:linear-gradient(90deg,var(--gold),#e6c878);' : ''}"></div>
+                  </div>
+                  <span class="prog-pct">${toArabicNum(pct)}%</span>
+                </div>`}
+          </td>
+          <td style="text-align:center;">${statusMarkup}</td>
+        </tr>
+      `;
+    }).join('');
+
+    // Render Alternative Card View
+    grid.innerHTML = classOrder.map(code => {
+      const rawVal = week.data[code];
+      const isUnrecorded = (rawVal === null || rawVal === undefined);
+      const attended = isUnrecorded ? 0 : rawVal;
+      const cap = registered[code] || 1;
+      const absent = Math.max(0, cap - attended);
+      const pct = Math.round((attended / cap) * 100);
+      const isTop = !isUnrecorded && code === weekTopClassCode;
+
+      let statusMarkup = '';
+      if(isUnrecorded){
+        statusMarkup = `<span class="status-tag unrecorded">${WARN_ICON} غير مُسجَّل</span>`;
+      } else if(pct >= 95){
+        statusMarkup = `<span class="status-tag excellent">ممتاز</span>`;
+      } else if(pct >= 88){
+        statusMarkup = `<span class="status-tag vgood">جيد جداً</span>`;
+      } else {
+        statusMarkup = `<span class="status-tag attention">يحتاج متابعة</span>`;
+      }
+
+      const barStyle = isUnrecorded
+        ? 'width:100%; background:repeating-linear-gradient(45deg,#e08a5c,#e08a5c 5px,#f3c9ab 5px,#f3c9ab 10px);'
+        : `width:${pct}%; ${isTop ? 'background:linear-gradient(90deg,var(--gold),#e6c878);' : ''}`;
+
+      return `
+        <div class="class-card ${isUnrecorded ? 'unrecorded-card' : ''}" ${isTop ? 'style="border-color:var(--gold); background:rgba(255,255,255,0.9);"' : ''}>
+          <div>
+            <div class="card-top">
+              <div>
+                <div class="class-name">${classInfo[code]}</div>
+              </div>
+              ${statusMarkup}
+            </div>
+            <div class="class-figures">
+              <div>
+                <span class="attended">${isUnrecorded ? '—' : toArabicNum(attended)}</span>
+                <span class="over">/ ${toArabicNum(cap)} مسجّل</span>
+              </div>
+              ${isUnrecorded ? '' : `<span class="rate">${toArabicNum(pct)}%</span>`}
+            </div>
+            <div class="bar-track">
+              <div class="bar-fill" style="${barStyle}"></div>
+            </div>
+          </div>
+          <div class="card-footer-info">
+            <span>${isUnrecorded ? `${WARN_ICON} لم تُدخل بيانات هذا الفصل بعد` : `الغياب: <b style="color:${absent > 3 ? '#9b2c2c' : 'inherit'};">${toArabicNum(absent)}</b> طالب`}</span>
+            ${isTop ? '<span style="color:var(--gold); font-weight:700;">★ الأعلى حضوراً</span>' : (isUnrecorded ? '' : '<span>نسبة الحضور الأسبوعي</span>')}
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  weekSelect.addEventListener('change', renderDashboard);
+  renderDashboard();
+}
+
+// ===================== Student Stats Section =====================
+// Gated independently of the attendance dashboard above — a user can be
+// authorized for one, both, or neither. SERVER_DATA.studentStats is null
+// unless the signed-in user is authorized for STUDENT_STATS_ACCESS.
+function renderClassRankTable(list){
+  if(!list || !list.length){
+    return `<div class="empty-state-card">لا توجد بيانات فصول متاحة بعد.</div>`;
+  }
+  const rows = list.map((c, i) => {
+    const isTop = i === 0;
+    const isLowest = i === list.length - 1 && list.length > 1;
+    return `
+      <tr ${isTop ? 'style="background:rgba(180,135,43,0.06);"' : ''}>
+        <td class="cell-idx">${toArabicNum(i + 1)}</td>
+        <td class="cell-class">
+          ${c.name}
+          ${isTop ? '<span style="color:var(--gold); margin-inline-start:4px; font-size:12px; font-weight:bold;">★ الأعلى</span>' : ''}
+          ${isLowest ? '<span style="color:#9b2c2c; margin-inline-start:4px; font-size:12px; font-weight:bold;">▼ الأدنى</span>' : ''}
+        </td>
+        <td style="text-align:center; font-weight:700; color:var(--green);">${toArabicNum(c.present)}</td>
+        <td style="text-align:center; font-weight:600; color:${c.absent > 3 ? '#9b2c2c' : 'var(--ink-soft)'};">${toArabicNum(c.absent)}</td>
+        <td>
+          <div class="prog-wrapper">
+            <div class="prog-track"><div class="prog-bar" style="width:${Math.round(c.rate)}%; ${isTop ? 'background:linear-gradient(90deg,var(--gold),#e6c878);' : ''}"></div></div>
+            <span class="prog-pct">${toArabicNum(c.rate.toFixed(1))}%</span>
+          </div>
+        </td>
+      </tr>`;
+  }).join('');
+  return `
+    <div class="table-container">
+      <table class="data-table">
+        <thead><tr>
+          <th class="cell-idx">م</th>
+          <th>الفصل الدراسي</th>
+          <th style="text-align:center;">الحضور</th>
+          <th style="text-align:center;">الغياب</th>
+          <th style="min-width:180px;">نسبة الحضور</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+}
+
+// Normalizes a phone number (as typed in the Contacts sheet — local
+// "05XXXXXXXX", with spaces/dashes, with or without a leading +/00,
+// etc.) into plain digits with a Saudi country code, suitable for a
+// tel: link (prefixed with "+") or a wa.me link (no "+"). Returns ''
+// when there's nothing usable.
+function normalizePhoneDigits(raw){
+  if(!raw) return '';
+  let digits = String(raw).replace(/[^\d]/g, '');
+  if(!digits) return '';
+  if(digits.startsWith('00')) digits = digits.slice(2);
+  if(digits.startsWith('0')) digits = '966' + digits.slice(1);
+  else if(!digits.startsWith('966') && digits.length === 9) digits = '966' + digits;
+  return digits;
+}
+
+// Builds the "اتصال / واتساب" actions cell for one student row. Call
+// opens a plain tel: link; WhatsApp opens a small menu of the 3
+// pre-written templates (see WHATSAPP_TEMPLATES, set in
+// setupStudentStats) via the delegated click handlers set up by
+// initContactActions(). A student with no matching row in the
+// Contacts sheet gets disabled, greyed-out buttons instead of dead links.
+// Small "آخر تواصل" (last contacted) indicator shown under a
+// student's call/WhatsApp buttons, built from the lastContact object
+// the server merges in (null when nobody's logged a contact for this
+// student yet, or when the viewer isn't authorized for contact
+// actions at all — in which case the whole actions cell is already
+// omitted upstream).
+function renderLastContactBadge(lastContact){
+  if(!lastContact) return '';
+  const d = new Date(lastContact.timestamp);
+  const dateStr = isNaN(d.getTime()) ? '' : toArabicNum(d.getDate()) + '/' + toArabicNum(d.getMonth() + 1);
+  const icon = lastContact.actionType === 'whatsapp' ? '💬' : '📞';
+  const who = lastContact.email ? (' — ' + lastContact.email) : '';
+  const title = 'آخر تواصل' + who + (dateStr ? (' — ' + dateStr) : '');
+  return `<div class="last-contact-badge" title="${title}">${icon}${dateStr ? ' ' + dateStr : ''}</div>`;
+}
+
+function renderContactActionsCell(s){
+  const callDigits = normalizePhoneDigits(s.callNumber);
+  const waDigits = normalizePhoneDigits(s.whatsappNumber);
+  const callHtml = callDigits
+    ? `<button type="button" class="contact-btn call-btn" data-tel="+${callDigits}" data-student="${encodeURIComponent(s.name)}" title="اتصال بولي الأمر" aria-label="اتصال بولي أمر ${s.name}">
+         <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.2.5 2.5.8 3.8.8.6 0 1 .4 1 1v3.5c0 .6-.4 1-1 1C10.6 21.3 2.7 13.4 2.7 2.8c0-.6.4-1 1-1H7.2c.6 0 1 .4 1 1 0 1.3.3 2.6.8 3.8.1.4.1.8-.2 1.1L6.6 10.8z"/></svg>
+       </button>`
+    : `<span class="contact-btn contact-btn-disabled" title="لا يوجد رقم اتصال مسجّل">
+         <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.2.5 2.5.8 3.8.8.6 0 1 .4 1 1v3.5c0 .6-.4 1-1 1C10.6 21.3 2.7 13.4 2.7 2.8c0-.6.4-1 1-1H7.2c.6 0 1 .4 1 1 0 1.3.3 2.6.8 3.8.1.4.1.8-.2 1.1L6.6 10.8z"/></svg>
+       </span>`;
+  const absencesCount = (typeof s.absent === 'number') ? s.absent : '';
+  const totalWeeksCount = Array.isArray(s.weekTags) ? s.weekTags.length : '';
+  const waHtml = waDigits
+    ? `<button type="button" class="contact-btn whatsapp-btn" data-wa="${waDigits}" data-student="${encodeURIComponent(s.name)}" data-absences="${absencesCount}" data-total-weeks="${totalWeeksCount}" title="إرسال واتساب لولي الأمر" aria-label="إرسال واتساب لولي أمر ${s.name}">
+         <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.1-1.6-.8-1.9-.9-.2-.1-.4-.1-.6.1-.2.2-.6.9-.8 1.1-.1.2-.3.2-.5.1-1.5-.7-2.5-1.3-3.5-2.9-.1-.2-.1-.4.1-.6.2-.2.5-.5.6-.7.1-.2.1-.4 0-.6-.1-.2-.6-1.5-.8-2-.2-.5-.4-.4-.6-.4-.2 0-.4 0-.6 0-.2 0-.5.1-.8.4-.3.3-1.1 1.1-1.1 2.6s1.1 3 1.3 3.2c.2.2 2.1 3.2 5.2 4.3 2.6.9 2.6.6 3.1.5.5-.1 1.6-.6 1.8-1.2.2-.6.2-1.2.2-1.3-.1-.1-.3-.2-.6-.3zM12 2.3C6.7 2.3 2.4 6.6 2.4 11.9c0 1.9.5 3.6 1.5 5.1L2.8 21l4.1-1.1c1.4.8 3.1 1.2 4.9 1.2 5.3 0 9.6-4.3 9.6-9.6S17.1 2.3 12 2.3z"/></svg>
+       </button>`
+    : `<span class="contact-btn contact-btn-disabled" title="لا يوجد رقم واتساب مسجّل">
+         <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.1-1.6-.8-1.9-.9-.2-.1-.4-.1-.6.1-.2.2-.6.9-.8 1.1-.1.2-.3.2-.5.1-1.5-.7-2.5-1.3-3.5-2.9-.1-.2-.1-.4.1-.6.2-.2.5-.5.6-.7.1-.2.1-.4 0-.6-.1-.2-.6-1.5-.8-2-.2-.5-.4-.4-.6-.4-.2 0-.4 0-.6 0-.2 0-.5.1-.8.4-.3.3-1.1 1.1-1.1 2.6s1.1 3 1.3 3.2c.2.2 2.1 3.2 5.2 4.3 2.6.9 2.6.6 3.1.5.5-.1 1.6-.6 1.8-1.2.2-.6.2-1.2.2-1.3-.1-.1-.3-.2-.6-.3zM12 2.3C6.7 2.3 2.4 6.6 2.4 11.9c0 1.9.5 3.6 1.5 5.1L2.8 21l4.1-1.1c1.4.8 3.1 1.2 4.9 1.2 5.3 0 9.6-4.3 9.6-9.6S17.1 2.3 12 2.3z"/></svg>
+       </span>`;
+  return `<div class="contact-actions">${callHtml}${waHtml}${renderLastContactBadge(s.lastContact)}</div>`;
+}
+
+function renderStudentTable(list, classInfo, metricKey, metricLabel, opts){
+  opts = opts || {};
+  if(!list || !list.length){
+    return `<div class="empty-state-card">لا توجد بيانات لعرضها حالياً.</div>`;
+  }
+  // Column 1 is a plain serial number (1, 2, 3...) fixed to render order —
+  // not a tie-aware rank/badge. It's baked into the HTML once here, so a
+  // column filter hiding rows afterward never renumbers what's left.
+  const rows = list.map((s, i) => {
+    const metricVal = s[metricKey];
+    const metricColor = opts.danger ? '#9b2c2c' : 'var(--green)';
+    const actionsCell = opts.contactButtons ? `<td style="text-align:center;">${renderContactActionsCell(s)}</td>` : '';
+    return `
+      <tr>
+        <td style="text-align:center; width:44px;"><span class="rank-badge">${toArabicNum(i + 1)}</span></td>
+        <td class="cell-class">${s.name}</td>
+        <td style="text-align:center;">${(classInfo && classInfo[s.classCode]) || s.classCode}</td>
+        <td style="text-align:center; font-weight:700; color:${metricColor};">${toArabicNum(metricVal)}</td>
+        ${actionsCell}
+      </tr>`;
+  }).join('');
+  const actionsHeader = opts.contactButtons ? `<th class="no-filter" style="text-align:center; width:84px;">الإجراءات</th>` : '';
+  return `
+    <div class="table-container">
+      <table class="data-table">
+        <thead><tr>
+          <th style="width:44px; text-align:center;">#</th>
+          <th>اسم الطالب</th>
+          <th style="text-align:center;">الفصل</th>
+          <th style="text-align:center;">${metricLabel}</th>
+          ${actionsHeader}
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+}
+
+// Delegated handling for the call/WhatsApp buttons added by
+// renderContactActionsCell(). Call buttons are plain tel: links and
+// need no JS. WhatsApp buttons open a small floating menu listing the
+// 3 pre-written templates; picking one opens wa.me with that template
+// (with {name} filled in) pre-filled as the message text. Wired once,
+// globally — safe to call again on re-render since it only attaches
+// listeners to document/body, not to the (re-created) table rows.
+// Fire-and-forget call to the server's contact log (see
+// logContactAction in Code.gs). onDone (optional) runs exactly once,
+// whether the write succeeded or failed — callers use it to delay a
+// tel:/wa.me navigation until AFTER the log call actually reaches the
+// server. This matters for the call button specifically: a tel: link
+// hands off to the phone's dialer app immediately, which on mobile
+// can suspend/kill the page before a fire-and-forget request
+// finishes — so for "call", log first, navigate after, rather than
+// firing both at once and hoping the request outruns the navigation.
+function safeLogContact(studentName, actionType, templateId, onDone){
+  let finished = false;
+  const done = () => { if(!finished){ finished = true; if(onDone) onDone(); } };
+  try {
+    serverRun
+      .withSuccessHandler(() => done())
+      .withFailureHandler(err => { console.warn('Contact log write failed:', err); done(); })
+      .logContactAction(studentName, actionType, templateId || '');
+  } catch(err) {
+    console.warn('Contact log write failed:', err);
+    done();
+  }
+}
+
+let _waMenuEl = null;
+let _waTemplates = [];
+function ensureWaMenu(){
+  if(_waMenuEl) return _waMenuEl;
+  const el = document.createElement('div');
+  el.className = 'wa-menu';
+  document.body.appendChild(el);
+  el.addEventListener('click', (e) => {
+    const btn = e.target.closest('.wa-menu-item');
+    if(!btn) return;
+    const tpl = _waTemplates.find(t => t.id === btn.dataset.tid);
+    const waNumber = el.dataset.wa;
+    const studentName = decodeURIComponent(el.dataset.student || '');
+    const absences = el.dataset.absences || '';
+    const totalWeeks = el.dataset.totalWeeks || '';
+    if(tpl && waNumber){
+      const text = tpl.text
+        .replace(/\{name\}/g, studentName)
+        .replace(/\{absences\}/g, String(absences))
+        .replace(/\{totalWeeks\}/g, String(totalWeeks));
+      safeLogContact(studentName, 'whatsapp', tpl.id);
+      window.open('https://wa.me/' + waNumber + '?text=' + encodeURIComponent(text), '_blank');
+    }
+    el.classList.remove('open');
+  });
+  document.addEventListener('click', (e) => {
+    if(el.classList.contains('open') && !el.contains(e.target) && !e.target.closest('.whatsapp-btn')){
+      el.classList.remove('open');
+    }
+  });
+  window.addEventListener('resize', () => el.classList.remove('open'));
+  _waMenuEl = el;
+  return el;
+}
+
+function initContactActions(whatsappTemplates){
+  _waTemplates = whatsappTemplates || [];
+  if(document.body.dataset.contactActionsWired) return;
+  document.body.dataset.contactActionsWired = '1';
+  // Call button: logs first, THEN navigates to tel: — not the other
+  // way around, so the dialer handoff can't cut the log request off
+  // mid-flight (see safeLogContact's comment). A slow/failed log
+  // still calls the tel: link right after, it just doesn't jump the
+  // queue ahead of it.
+  document.addEventListener('click', (e) => {
+    const callBtn = e.target.closest('.call-btn');
+    if(!callBtn) return;
+    const tel = callBtn.dataset.tel;
+    const studentName = decodeURIComponent(callBtn.dataset.student || '');
+    safeLogContact(studentName, 'call', '', () => {
+      if(tel) window.location.href = 'tel:' + tel;
+    });
+  });
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('.whatsapp-btn');
+    if(!btn) return;
+    const menu = ensureWaMenu();
+    menu.innerHTML = _waTemplates.map(t =>
+      `<button type="button" class="wa-menu-item" data-tid="${t.id}">${t.label}</button>`
+    ).join('') || '<div class="col-filter-empty">لا توجد رسائل معدة</div>';
+    menu.dataset.wa = btn.dataset.wa;
+    menu.dataset.student = btn.dataset.student;
+    menu.dataset.absences = btn.dataset.absences || '';
+    menu.dataset.totalWeeks = btn.dataset.totalWeeks || '';
+    const rect = btn.getBoundingClientRect();
+    menu.style.top = (window.scrollY + rect.bottom + 6) + 'px';
+    menu.style.left = (window.scrollX + rect.left) + 'px';
+    menu.classList.add('open');
+  });
+}
+
+// "بالتفصيل" — every student, every recorded week, as حاضر/غائب/— tags.
+// weekCount is the widest per-student record trail across all classes;
+// a student with fewer submitted weeks than that gets "—" (not yet
+// recorded) padding out the remaining columns.
+function renderDetailTable(list, classInfo, weekCount){
+  if(!list || !list.length){
+    return `<div class="empty-state-card">لا توجد بيانات لعرضها حالياً.</div>`;
+  }
+  const weekHeaders = Array.from({ length: weekCount }, (_, w) =>
+    `<th style="text-align:center; white-space:nowrap;">الأسبوع ${toArabicNum(w + 1)}</th>`
+  ).join('');
+  const rows = list.map((s, i) => {
+    const weekCells = Array.from({ length: weekCount }, (_, w) => {
+      const tag = s.weekTags[w];
+      if(tag === 'present') return `<td style="text-align:center;"><span class="week-tag present">حاضر</span></td>`;
+      if(tag === 'absent') return `<td style="text-align:center;"><span class="week-tag absent">غائب</span></td>`;
+      return `<td style="text-align:center;"><span class="week-tag unrecorded">—</span></td>`;
+    }).join('');
+    return `
+      <tr>
+        <td class="cell-idx">${toArabicNum(i + 1)}</td>
+        <td class="cell-class">${s.name}</td>
+        <td style="text-align:center;">${(classInfo && classInfo[s.classCode]) || s.classCode}</td>
+        ${weekCells}
+      </tr>`;
+  }).join('');
+  return `
+    <div class="table-container">
+      <table class="data-table">
+        <thead><tr>
+          <th class="cell-idx">م</th>
+          <th>اسم الطالب</th>
+          <th style="text-align:center;">الفصل</th>
+          ${weekHeaders}
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+}
+
+// Adds a per-column filter row under a table's header — each column gets
+// a dropdown of checkboxes listing that column's distinct values (like a
+// spreadsheet's column filter), rather than a free-text box. Selecting
+// one or more values keeps only matching rows for that column; columns
+// combine with AND. Safe to call on an empty-state card (no table).
+function attachColumnFilters(containerEl){
+  const table = containerEl.querySelector('table.data-table');
+  if(!table) return;
+  const headRow = table.querySelector('thead tr');
+  const tbody = table.querySelector('tbody');
+  if(!headRow || !tbody) return;
+  const colCount = headRow.children.length;
+  const dataRows = Array.from(tbody.querySelectorAll('tr'));
+
+  function cellText(row, i){
+    const cell = row.children[i];
+    return cell ? cell.textContent.trim().replace(/\s+/g, ' ') : '';
+  }
+
+  // Distinct values per column, taken from the rendered cells themselves.
+  const colValues = [];
+  for(let i = 0; i < colCount; i++){
+    const set = new Set();
+    dataRows.forEach(row => { const t = cellText(row, i); if(t) set.add(t); });
+    colValues.push(Array.from(set).sort((a, b) => a.localeCompare(b, 'ar')));
+  }
+  const activeFilters = colValues.map(() => new Set()); // empty set = no filter on that column
+
+  const filterRow = document.createElement('tr');
+  filterRow.className = 'filter-row';
+  const allBtns = [];
+  const allPanels = [];
+
+  function closeAllPanels(){
+    allPanels.forEach(p => { if(p) p.classList.remove('open'); });
+    allBtns.forEach(b => { if(b) b.classList.remove('open'); });
+  }
+
+  function updateButtonLabel(i){
+    const count = activeFilters[i].size;
+    const labelEl = allBtns[i].querySelector('.col-filter-btn-label');
+    if(count === 0){ labelEl.textContent = 'الكل'; allBtns[i].classList.remove('active'); }
+    else { labelEl.textContent = count + ' محدد'; allBtns[i].classList.add('active'); }
+  }
+
+  function applyFilters(){
+    let visibleCount = 0;
+    dataRows.forEach(row => {
+      let matches = true;
+      for(let i = 0; i < colCount; i++){
+        if(activeFilters[i].size === 0) continue;
+        if(!activeFilters[i].has(cellText(row, i))){ matches = false; break; }
+      }
+      row.style.display = matches ? '' : 'none';
+      if(matches) visibleCount++;
+    });
+    // Renumber column 0 to a gap-free 1,2,3... over whatever is currently
+    // visible, so a filter never leaves the serial numbers skipping.
+    let serial = 0;
+    dataRows.forEach(row => {
+      if(row.style.display === 'none') return;
+      serial++;
+      const firstCell = row.children[0];
+      if(!firstCell) return;
+      const badgeEl = firstCell.querySelector('.rank-badge');
+      (badgeEl || firstCell).textContent = toArabicNum(serial);
+    });
+    let noResultsRow = tbody.querySelector('.no-filter-results');
+    if(visibleCount === 0){
+      if(!noResultsRow){
+        noResultsRow = document.createElement('tr');
+        noResultsRow.className = 'no-filter-results';
+        const td = document.createElement('td');
+        td.colSpan = colCount;
+        td.textContent = 'لا توجد نتائج مطابقة لعوامل التصفية.';
+        noResultsRow.appendChild(td);
+        tbody.appendChild(noResultsRow);
+      }
+      noResultsRow.style.display = '';
+    } else if(noResultsRow){
+      noResultsRow.style.display = 'none';
+    }
+  }
+
+  for(let i = 0; i < colCount; i++){
+    // Column 0 is always a serial/rank number (م, #) — not a real
+    // attribute of the row, so it gets no filter widget at all. Any
+    // column whose header is marked "no-filter" (e.g. the call/WhatsApp
+    // actions column) is skipped the same way — its cells hold buttons,
+    // not a filterable value.
+    if(i === 0 || headRow.children[i].classList.contains('no-filter')){
+      filterRow.appendChild(document.createElement('td'));
+      allBtns.push(null);
+      allPanels.push(null);
+      continue;
+    }
+    const headerText = (headRow.children[i].textContent || '').trim();
+    const td = document.createElement('td');
+    const wrap = document.createElement('div');
+    wrap.className = 'col-filter-wrap';
+
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'col-filter-btn';
+    btn.setAttribute('aria-label', 'تصفية عمود ' + headerText);
+    btn.innerHTML = `<span class="col-filter-btn-label">الكل</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>`;
+
+    const panel = document.createElement('div');
+    panel.className = 'col-filter-panel';
+
+    const values = colValues[i];
+    if(values.length === 0){
+      panel.innerHTML = '<div class="col-filter-empty">لا توجد قيم</div>';
+    } else {
+      // Search box — narrows which checklist options are shown (not
+      // which rows are selected), so it works alongside the checkboxes
+      // rather than replacing them: type to find a value in a long
+      // list, then check it (or "تحديد الكل" to select every value
+      // currently matching the search).
+      const searchWrap = document.createElement('div');
+      searchWrap.className = 'col-filter-search-wrap';
+      const searchInput = document.createElement('input');
+      searchInput.type = 'text';
+      searchInput.className = 'col-filter-search';
+      searchInput.placeholder = 'بحث...';
+      searchWrap.appendChild(searchInput);
+      panel.appendChild(searchWrap);
+
+      const optionsWrap = document.createElement('div');
+      optionsWrap.className = 'col-filter-options';
+      const optionRows = []; // { el, val, normalized }
+      values.forEach(val => {
+        const label = document.createElement('label');
+        label.className = 'col-filter-option';
+        const cb = document.createElement('input');
+        cb.type = 'checkbox';
+        cb.value = val;
+        cb.addEventListener('change', () => {
+          if(cb.checked) activeFilters[i].add(val);
+          else activeFilters[i].delete(val);
+          updateButtonLabel(i);
+          applyFilters();
+        });
+        const span = document.createElement('span');
+        span.textContent = val;
+        label.appendChild(cb);
+        label.appendChild(span);
+        optionsWrap.appendChild(label);
+        optionRows.push({ el: label, val: val, normalized: val.toLowerCase() });
+      });
+      panel.appendChild(optionsWrap);
+
+      let noMatchRow = null;
+      searchInput.addEventListener('input', () => {
+        const q = searchInput.value.trim().toLowerCase();
+        let anyVisible = false;
+        optionRows.forEach(row => {
+          const matches = !q || row.normalized.includes(q);
+          row.el.classList.toggle('search-hidden', !matches);
+          if(matches) anyVisible = true;
+        });
+        if(!anyVisible){
+          if(!noMatchRow){
+            noMatchRow = document.createElement('div');
+            noMatchRow.className = 'col-filter-empty';
+            noMatchRow.textContent = 'لا توجد نتائج مطابقة';
+            optionsWrap.appendChild(noMatchRow);
+          }
+          noMatchRow.style.display = '';
+        } else if(noMatchRow){
+          noMatchRow.style.display = 'none';
+        }
+      });
+      searchInput.addEventListener('click', (e) => e.stopPropagation());
+
+      const actions = document.createElement('div');
+      actions.className = 'col-filter-actions';
+      const selectAllBtn = document.createElement('button');
+      selectAllBtn.type = 'button';
+      selectAllBtn.textContent = 'تحديد الكل';
+      selectAllBtn.addEventListener('click', () => {
+        // Only the values currently matching the search box — with no
+        // search text, that's every value, same as before.
+        optionRows.forEach(row => {
+          if(row.el.classList.contains('search-hidden')) return;
+          const cb = row.el.querySelector('input[type=checkbox]');
+          cb.checked = true;
+          activeFilters[i].add(cb.value);
+        });
+        updateButtonLabel(i);
+        applyFilters();
+      });
+      const clearBtn = document.createElement('button');
+      clearBtn.type = 'button';
+      clearBtn.textContent = 'مسح';
+      clearBtn.addEventListener('click', () => {
+        panel.querySelectorAll('input[type=checkbox]').forEach(cb => { cb.checked = false; });
+        activeFilters[i].clear();
+        updateButtonLabel(i);
+        applyFilters();
+      });
+      actions.appendChild(selectAllBtn);
+      actions.appendChild(clearBtn);
+      panel.appendChild(actions);
+    }
+
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const willOpen = !panel.classList.contains('open');
+      closeAllPanels();
+      if(willOpen){
+        panel.classList.add('open');
+        btn.classList.add('open');
+        const searchInput = panel.querySelector('.col-filter-search');
+        if(searchInput){ searchInput.value = ''; searchInput.dispatchEvent(new Event('input')); searchInput.focus(); }
+      }
+    });
+    panel.addEventListener('click', (e) => e.stopPropagation());
+
+    wrap.appendChild(btn);
+    wrap.appendChild(panel);
+    td.appendChild(wrap);
+    filterRow.appendChild(td);
+    allBtns.push(btn);
+    allPanels.push(panel);
+  }
+
+  table.querySelector('thead').appendChild(filterRow);
+  document.addEventListener('click', closeAllPanels);
+}
+
+function csvEscape(val){
+  const s = String(val === null || val === undefined ? '' : val);
+  if(/[",\r\n]/.test(s)) return '"' + s.replace(/"/g, '""') + '"';
+  return s;
+}
+
+// Exports exactly what's on screen — only currently visible rows, so an
+// active column filter is respected automatically. Reads the real header
+// row (the first <tr> in <thead> — the filter-input row is the second)
+// and every non-hidden <tbody> row, straight from the rendered table.
+function exportTableToCsv(table, filenameBase){
+  const headRow = table.querySelector('thead tr');
+  if(!headRow) return;
+  const headers = Array.from(headRow.children).map(th => (th.textContent || '').trim());
+  const rows = Array.from(table.querySelectorAll('tbody tr'))
+    .filter(tr => tr.style.display !== 'none' && !tr.classList.contains('no-filter-results'))
+    .map(tr => Array.from(tr.children).map(td => (td.textContent || '').trim().replace(/\s+/g, ' ')));
+
+  if(rows.length === 0){
+    alert('لا توجد صفوف ظاهرة للتصدير — تحقق من عوامل التصفية.');
+    return;
+  }
+
+  const csvContent = [headers, ...rows].map(r => r.map(csvEscape).join(',')).join('\r\n');
+  // Leading BOM so Excel opens the Arabic text as UTF-8 instead of guessing wrong.
+  const blob = new Blob(['﻿' + csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  const ts = new Date().toISOString().slice(0, 10);
+  a.download = filenameBase + '-' + ts + '.csv';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// Adds the "تصدير CSV" toolbar above a rendered table. No-op on an
+// empty-state card (no table to export).
+function attachExportButton(containerEl, filenameBase){
+  const table = containerEl.querySelector('table.data-table');
+  const wrapper = containerEl.querySelector('.table-container');
+  if(!table || !wrapper) return;
+
+  const toolbar = document.createElement('div');
+  toolbar.className = 'panel-toolbar';
+  toolbar.innerHTML = `
+    <button type="button" class="export-btn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      تصدير CSV
+    </button>`;
+  wrapper.parentNode.insertBefore(toolbar, wrapper);
+  toolbar.querySelector('.export-btn').addEventListener('click', () => exportTableToCsv(table, filenameBase));
+}
+
+function setupStudentStats(stats){
+  const { classInfo, classLeaderboard, topStudents, lowestStudents, perfectAttendance, needsFollowUp, detailed, weekCount, whatsappTemplates, contactActionsAllowed } = stats;
+  initContactActions(whatsappTemplates);
+
+  // Accordion toggle
+  const cat = document.getElementById('studentStatsCollapseCat');
+  const head = document.getElementById('studentStatsCatHead');
+  head.addEventListener('click', () => {
+    const isOpen = cat.classList.contains('open');
+    cat.classList.toggle('open', !isOpen);
+    head.setAttribute('aria-expanded', String(!isOpen));
+  });
+
+  // Tab switcher
+  const tabs = Array.from(document.querySelectorAll('#statsTabs .stats-tab-btn'));
+  const panelIds = {
+    classRank: 'statsPanel-classRank', top: 'statsPanel-top', lowest: 'statsPanel-lowest',
+    perfect: 'statsPanel-perfect', followup: 'statsPanel-followup', detail: 'statsPanel-detail'
+  };
+  tabs.forEach(btn => {
+    btn.addEventListener('click', () => {
+      tabs.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      Object.values(panelIds).forEach(id => { document.getElementById(id).style.display = 'none'; });
+      document.getElementById(panelIds[btn.dataset.panel]).style.display = 'block';
+    });
+  });
+
+  // KPI summary row
+  const topClass = classLeaderboard[0];
+  const lowestClass = classLeaderboard.length > 1 ? classLeaderboard[classLeaderboard.length - 1] : null;
+  document.getElementById('statsSummaryBanner').innerHTML = `
+    <div class="summary-pill highlight">
+      <div>
+        <div class="pill-label">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          أعلى فصل حضوراً
+        </div>
+        <div class="pill-num" style="color:var(--gold-soft); font-size:17px; line-height:1.3; margin-top:4px;">${topClass ? topClass.name : '—'}</div>
+        <div class="pill-sub">${topClass ? toArabicNum(topClass.rate.toFixed(1)) + '%' : 'لا توجد بيانات بعد'}</div>
+      </div>
+      <div class="pill-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+      </div>
+    </div>
+    <div class="summary-pill">
+      <div>
+        <div class="pill-label">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/></svg>
+          أدنى فصل حضوراً
+        </div>
+        <div class="pill-num" style="color:#9b2c2c; font-size:17px; line-height:1.3; margin-top:4px;">${lowestClass ? lowestClass.name : '—'}</div>
+        <div class="pill-sub">${lowestClass ? toArabicNum(lowestClass.rate.toFixed(1)) + '%' : 'لا توجد بيانات بعد'}</div>
+      </div>
+      <div class="pill-icon" style="background:#fee2e2; border-color:#fecaca; color:#b91c1c;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </div>
+    </div>
+    <div class="summary-pill">
+      <div>
+        <div class="pill-label">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
+          حضور مثالي
+        </div>
+        <div class="pill-num">${toArabicNum(perfectAttendance.length)}</div>
+        <div class="pill-sub">طالباً بدون أي غياب</div>
+      </div>
+      <div class="pill-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg>
+      </div>
+    </div>
+    <div class="summary-pill">
+      <div>
+        <div class="pill-label">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/></svg>
+          بحاجة إلى متابعة
+        </div>
+        <div class="pill-num" style="color:#9b2c2c;">${toArabicNum(needsFollowUp.length)}</div>
+        <div class="pill-sub">غياب متتالٍ</div>
+      </div>
+      <div class="pill-icon" style="background:#fee2e2; border-color:#fecaca; color:#b91c1c;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/></svg>
+      </div>
+    </div>
+  `;
+
+  // Panels — each wrapped on its own so a problem in one list (e.g. a
+  // field the backend didn't send) can't blank out the panels after it.
+  // On failure the panel shows a plain notice instead of staying empty
+  // with no explanation, and the error is logged to the console.
+  function renderPanel(panelId, fn, filenameBase, opts){
+    opts = opts || {};
+    const el = document.getElementById(panelId);
+    try {
+      el.innerHTML = fn();
+      if(!opts.noFilters) attachColumnFilters(el); // no-op if the panel rendered an empty-state card
+      attachExportButton(el, filenameBase);
+    } catch (err) {
+      console.error('Student stats panel "' + panelId + '" failed to render:', err);
+      el.innerHTML =
+        '<div class="empty-state-card">تعذّر عرض هذه القائمة (خطأ في البيانات الواردة من الخادم). افتح أدوات المطوّر (Console) لمعرفة التفاصيل.</div>';
+    }
+  }
+
+  // "ترتيب الفصول" has only 8 rows (one per class) — no filter needed.
+  renderPanel('statsPanel-classRank', () => renderClassRankTable(classLeaderboard), 'ترتيب-الفصول', { noFilters: true });
+  renderPanel('statsPanel-top', () => renderStudentTable(topStudents, classInfo, 'present', 'عدد الحضور', {}), 'الأعلى-حضوراً');
+  renderPanel('statsPanel-lowest', () => renderStudentTable(lowestStudents, classInfo, 'absent', 'عدد الغياب', { danger: true, contactButtons: !!contactActionsAllowed }), 'الأعلى-غياباً');
+  renderPanel('statsPanel-perfect', () => renderStudentTable(perfectAttendance, classInfo, 'present', 'عدد الحضور', {}), 'الحضور-المثالي');
+  renderPanel('statsPanel-followup', () => renderStudentTable(needsFollowUp, classInfo, 'streak', 'غياب متتالٍ', { danger: true }), 'بحاجة-إلى-متابعة');
+  renderPanel('statsPanel-detail', () => renderDetailTable(detailed, classInfo, weekCount), 'بالتفصيل');
+}
+
+// Builds the whole page from SERVER_DATA. Runs once, right after
+// sign-in, when boot() has received this user's data.
+function startApp(){
+  buildList(SERVER_DATA.categories);
+  setupFormsAccordion();
+
+  // Signed in, but nothing is allowed for this account — most often
+  // because the phone is signed in with a different Gmail than the
+  // one the admin registered. Say so, instead of showing an empty page.
+  const hasAnything = SERVER_DATA.categories.length > 0 || SERVER_DATA.attendanceDashboard || SERVER_DATA.studentStats;
+  if (!hasAnything) {
+    const shownEmail = document.getElementById('userEmailMeta').textContent;
+    document.getElementById('pages').innerHTML = `
+      <div class="empty-state-card">
+        لا توجد أقسام متاحة لهذا الحساب (<span style="direction:ltr; display:inline-block;">${shownEmail.replace(/[&<>"']/g, '')}</span>).<br/>
+        إذا كنت تتوقع رؤية محتوى، فربما سجّلت الدخول بحساب غير المسجّل لدى الإدارة.<br/><br/>
+        <button type="button" class="auth-btn" onclick="switchAccount()">تبديل الحساب</button>
+      </div>`;
+  }
+
+  // Shown directly, with no link or click needed — but only when the
+  // signed-in user is authorized. If they are not, SERVER_DATA.attendanceDashboard
+  // is null: the section stays removed and no attendance numbers are
+  // ever sent to this browser for that user.
+  if (SERVER_DATA.attendanceDashboard) {
+    document.getElementById('dashboardSection').style.display = '';
+    setupAttendanceDashboard(SERVER_DATA.attendanceDashboard);
+  } else {
+    document.getElementById('dashboardSection').remove();
+  }
+
+  // Same pattern, independent gate: a user can be authorized for the
+  // student-stats section without being authorized for the attendance
+  // dashboard above (or vice versa).
+  if (SERVER_DATA.studentStats) {
+    document.getElementById('studentStatsSection').style.display = '';
+    setupStudentStats(SERVER_DATA.studentStats);
+  } else {
+    document.getElementById('studentStatsSection').remove();
+  }
+}
+
+// ============================================================
+// Admin control panel. Gated by a shared PIN — see ITEMS_ADMIN_PIN in
+// Code.gs. The PIN is kept only in this page's memory (never
+// localStorage), and is sent again with every call so the server can
+// re-check it — this client-side gate is just convenience, not the
+// real security boundary.
+//
+// Design: everything loaded from the server (items, access rules, the
+// Name/Email directory) lives in one in-memory `state` object. Every
+// field edit, checkbox toggle, or Permissions-matrix tick just mutates
+// `state` directly — NOTHING is sent to the server until "حفظ كل
+// التغييرات" is clicked, which sends the whole state in ONE
+// saveAllAdmin() call. The only exception is adding a brand-new item,
+// which still saves immediately (it needs a server-confirmed row
+// before it can appear as a matrix column).
+//
+// "Allowed" email lists are no longer free-text here at all — they're
+// edited ONLY from the Permissions matrix tab, by ticking a checkbox
+// against a person pulled from the Main spreadsheet's "Contacts" tab,
+// columns J (name) / K (email). The item/access-rule cards show that
+// list as a read-only preview (resolved to names where possible) so
+// nobody can introduce a typo'd email that quietly never matches
+// anyone.
+// ============================================================
+(function(){
+  const ADMIN_FIELDS = [
+    { key: 'catAr', label: 'التصنيف (عربي)', type: 'text' },
+    { key: 'catEn', label: 'التصنيف (English)', type: 'text' },
+    { key: 'name', label: 'الاسم', type: 'text', full: true },
+    { key: 'type', label: 'النوع (form / spreadsheet)', type: 'text' },
+    { key: 'link', label: 'الرابط', type: 'text', full: true },
+    { key: 'public', label: 'عام (يراه الجميع)', type: 'checkbox' }
+  ];
+  const ACCESS_RULE_NAMES_CLIENT = ['attendanceDashboard', 'studentStats', 'contactActions'];
+  const ACCESS_RULE_LABELS = {
+    attendanceDashboard: 'لوحة الحضور الأسبوعية',
+    studentStats: 'لوحة إحصاءات الطلاب',
+    contactActions: 'أزرار التواصل (اتصال / واتساب)'
+  };
+  const ACCESS_RULE_SHORT_LABELS = {
+    attendanceDashboard: 'الحضور',
+    studentStats: 'الإحصاءات',
+    contactActions: 'التواصل'
+  };
+
+  let adminPin = '';
+  let isDirty = false;
+  // Everything the panel works with, loaded in one shot by loadAll()
+  // and mutated in place by every edit until "حفظ كل التغييرات".
+  let state = { items: [], accessRules: {}, directory: [] };
+
+  const overlay = document.getElementById('adminPanelOverlay');
+  const pinScreen = document.getElementById('adminPinScreen');
+  const itemsScreen = document.getElementById('adminItemsScreen');
+  const pinInput = document.getElementById('adminPinInput');
+  const pinError = document.getElementById('adminPinError');
+  const itemsMsg = document.getElementById('adminItemsMsg');
+  const saveMsg = document.getElementById('adminSaveMsg');
+  const itemsList = document.getElementById('adminItemsList');
+  const addForm = document.getElementById('adminAddForm');
+  const accessRulesEl = document.getElementById('adminAccessRules');
+  const matrixTable = document.getElementById('adminMatrixTable');
+  const saveAllBtn = document.getElementById('adminSaveAllBtn');
+
+  function showMsg(el, text, ok){
+    el.textContent = text;
+    el.className = ok ? 'admin-success' : 'admin-error';
+    el.style.display = text ? 'block' : 'none';
+  }
+  function escHtml(s){
+    return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[c]));
+  }
+  function markDirty(){
+    isDirty = true;
+    saveAllBtn.classList.add('admin-dirty');
+    saveAllBtn.textContent = '💾 حفظ كل التغييرات (تغييرات غير محفوظة)';
+  }
+  function clearDirty(){
+    isDirty = false;
+    saveAllBtn.classList.remove('admin-dirty');
+    saveAllBtn.textContent = '💾 حفظ كل التغييرات';
+  }
+
+  function switchAdminTab(tab){
+    document.querySelectorAll('.admin-tab-btn').forEach(b => b.classList.toggle('active', b.dataset.adminTab === tab));
+    document.getElementById('adminTabItems').style.display = tab === 'items' ? '' : 'none';
+    document.getElementById('adminTabAccess').style.display = tab === 'access' ? '' : 'none';
+  }
+  document.querySelectorAll('.admin-tab-btn').forEach(b => {
+    b.addEventListener('click', () => switchAdminTab(b.dataset.adminTab));
+  });
+
+  // Resolves an email to the matching directory name for display, or
+  // just shows the raw email if nobody in Contacts J/K matches it.
+  function resolveChipLabel(email){
+    const norm = String(email || '').trim().toLowerCase();
+    const match = state.directory.find(d => String(d.email || '').trim().toLowerCase() === norm);
+    return match ? match.name : email;
+  }
+  function renderAllowedPreview(list){
+    if (!list || !list.length) return '<span class="admin-hint">لا يوجد أحد مُفعّل بعد.</span>';
+    return list.map(e => `<span class="admin-chip">${escHtml(resolveChipLabel(e))}</span>`).join(' ');
+  }
+  function emailInList(list, email){
+    const norm = String(email || '').trim().toLowerCase();
+    return (list || []).some(e => String(e || '').trim().toLowerCase() === norm);
+  }
+  function toggleAllowed(obj, email, checked){
+    obj.allowed = obj.allowed || [];
+    const norm = String(email).trim().toLowerCase();
+    const idx = obj.allowed.findIndex(e => String(e).trim().toLowerCase() === norm);
+    if (checked && idx === -1) obj.allowed.push(email);
+    else if (!checked && idx !== -1) obj.allowed.splice(idx, 1);
+  }
+
+  // ---------- Items tab ----------
+  function fieldHtml(field, value, idx){
+    const id = 'item_' + idx + '_' + field.key;
+    if (field.type === 'checkbox'){
+      return `<div class="admin-field admin-field-public"><input type="checkbox" id="${id}" data-idx="${idx}" data-key="${field.key}" ${value ? 'checked' : ''}/><label for="${id}" style="margin:0;">${field.label}</label></div>`;
+    }
+    return `<div class="admin-field${field.full ? ' admin-field-full' : ''}"><label for="${id}">${field.label}</label><input type="text" id="${id}" data-idx="${idx}" data-key="${field.key}" value="${escHtml(value)}"/></div>`;
+  }
+
+  function renderItemsList(){
+    itemsList.innerHTML = state.items.map((item, idx) => `
+      <details class="admin-item-card">
+        <summary>
+          <span class="admin-item-name">${escHtml(item.name || item.id)}</span>
+          <span class="admin-item-meta">${escHtml(item.catAr || '')} · ${escHtml(item.id)}</span>
+        </summary>
+        <div class="admin-form">
+          ${ADMIN_FIELDS.map(f => fieldHtml(f, item[f.key], idx)).join('')}
+          <div class="admin-field-full admin-allowed-preview">
+            <label>مسموح له حالياً</label>
+            <div>${renderAllowedPreview(item.allowed)}</div>
+            <button type="button" class="admin-link-btn" data-goto-permissions="1">✎ تعديل من تبويب الصلاحيات</button>
+          </div>
+        </div>
+      </details>`).join('') || '<p class="admin-hint">لا توجد أصناف بعد.</p>';
+  }
+
+  ['input', 'change'].forEach(evt => itemsList.addEventListener(evt, (e) => {
+    const el = e.target;
+    if (el.dataset.idx === undefined || !el.dataset.key) return;
+    const item = state.items[parseInt(el.dataset.idx, 10)];
+    if (!item) return;
+    item[el.dataset.key] = (el.type === 'checkbox') ? el.checked : el.value;
+    markDirty();
+  }));
+  itemsList.addEventListener('click', (e) => {
+    if (e.target.closest('[data-goto-permissions]')) switchAdminTab('access');
+  });
+
+  // ---------- "Add new item" — still an immediate save (needs a
+  // server-confirmed id before it can be a matrix column) ----------
+  function addFieldHtml(field){
+    const id = 'new_' + field.key;
+    if (field.type === 'checkbox'){
+      return `<div class="admin-field admin-field-public"><input type="checkbox" id="${id}"/><label for="${id}" style="margin:0;">${field.label}</label></div>`;
+    }
+    return `<div class="admin-field${field.full ? ' admin-field-full' : ''}"><label for="${id}">${field.label}</label><input type="text" id="${id}"/></div>`;
+  }
+  function renderAddForm(){
+    addForm.innerHTML = `<div class="admin-field admin-field-full"><label for="new_id">المعرّف (id) — حروف/أرقام إنجليزية بلا مسافات</label><input type="text" id="new_id"/></div>` +
+      ADMIN_FIELDS.map(addFieldHtml).join('') +
+      `<div class="admin-field-full" style="margin-top:4px;"><button type="button" id="adminAddSubmit" class="admin-btn admin-btn-primary">إضافة</button></div>` +
+      `<p class="admin-hint admin-field-full">يُحفظ فوراً دون انتظار "حفظ كل التغييرات" — بعد الإضافة، حدد من يُسمح له من تبويب الصلاحيات.</p>`;
+  }
+  addForm.addEventListener('click', (e) => {
+    if (!e.target.closest('#adminAddSubmit')) return;
+    const val = k => { const el = document.getElementById('new_' + k); return el ? el.value : ''; };
+    const checked = k => { const el = document.getElementById('new_' + k); return el ? el.checked : false; };
+    const id = (document.getElementById('new_id').value || '').trim();
+    if (!id){ showMsg(itemsMsg, 'يجب إدخال المعرّف (id).', false); return; }
+    const newItem = {
+      id: id, catAr: val('catAr'), catEn: val('catEn'), name: val('name'),
+      type: val('type'), link: val('link'), public: checked('public'), allowed: []
+    };
+    serverRun
+      .withSuccessHandler(() => {
+        showMsg(itemsMsg, 'تم إضافة الصنف بنجاح. حدد المسموح لهم من تبويب الصلاحيات.', true);
+        state.items.push(newItem);
+        renderItemsList();
+        renderMatrix();
+        document.getElementById('adminAddCard').open = false;
+        renderAddForm();
+      })
+      .withFailureHandler(err => showMsg(itemsMsg, String(err && err.message || err), false))
+      .saveItemAdmin(adminPin, Object.assign({}, newItem, { allowed: '' }));
+  });
+
+  // ---------- Access rules (public toggle + read-only preview) ----------
+  function renderAccessRules(){
+    accessRulesEl.innerHTML = `
+      <p class="admin-hint admin-access-note">
+        تذكير: أي بريد يُفعَّل في أحد الأقسام الثلاثة أدناه يحتاج أيضاً صلاحية Google مباشرة
+        على جدول البيانات الرئيسي (Main) — Viewer لـ"الحضور" و"الإحصاءات"، أو Editor لـ"التواصل" —
+        وإلا ستفشل قراءته رغم تفعيله هنا. تبويبا "الأصناف" و"الصلاحيات" نفساهما مُشارَكان تلقائياً
+        مع أي شخص لديه الرابط، فلا حاجة لمشاركتهما يدوياً مع أحد.
+      </p>` +
+      ACCESS_RULE_NAMES_CLIENT.map(name => {
+        const rule = state.accessRules[name] || { public: false, allowed: [] };
+        return `
+          <div class="admin-access-card">
+            <div class="admin-access-name">${ACCESS_RULE_LABELS[name]}</div>
+            <div class="admin-field admin-field-public">
+              <input type="checkbox" id="rule_${name}_public" data-rule="${name}" ${rule.public ? 'checked' : ''}/>
+              <label for="rule_${name}_public" style="margin:0;">عام (يراه الجميع بلا قيود)</label>
+            </div>
+            <label>مسموح له حالياً</label>
+            <div>${renderAllowedPreview(rule.allowed)}</div>
+          </div>`;
+      }).join('');
+  }
+  accessRulesEl.addEventListener('change', (e) => {
+    const el = e.target;
+    if (!el.dataset.rule) return;
+    state.accessRules[el.dataset.rule] = state.accessRules[el.dataset.rule] || { public: false, allowed: [] };
+    state.accessRules[el.dataset.rule].public = el.checked;
+    markDirty();
+  });
+
+  // ---------- Permissions matrix ----------
+  function buildMatrixRows(){
+    const rows = state.directory.map(d => ({ name: d.name, email: d.email, known: true }));
+    const knownEmails = new Set(state.directory.map(d => String(d.email).trim().toLowerCase()));
+    const extra = new Map();
+    state.items.forEach(it => (it.allowed || []).forEach(e => {
+      const norm = String(e).trim().toLowerCase();
+      if (norm && !knownEmails.has(norm) && !extra.has(norm)) extra.set(norm, String(e).trim());
+    }));
+    ACCESS_RULE_NAMES_CLIENT.forEach(name => {
+      const rule = state.accessRules[name];
+      (rule && rule.allowed || []).forEach(e => {
+        const norm = String(e).trim().toLowerCase();
+        if (norm && !knownEmails.has(norm) && !extra.has(norm)) extra.set(norm, String(e).trim());
+      });
+    });
+    extra.forEach(email => rows.push({ name: '(غير مُدرَج في Contacts)', email: email, known: false }));
+    return rows;
+  }
+
+  function renderMatrix(){
+    const rows = buildMatrixRows();
+    let thead = '<thead><tr><th class="admin-matrix-sticky">الاسم</th><th class="admin-matrix-sticky admin-matrix-email">البريد</th>';
+    state.items.forEach((it, i) => { thead += `<th class="admin-matrix-head-wrap" title="${escHtml(it.name)}">${escHtml(it.name || it.id)}</th>`; });
+    ACCESS_RULE_NAMES_CLIENT.forEach(name => { thead += `<th title="${escHtml(ACCESS_RULE_LABELS[name])}">${escHtml(ACCESS_RULE_SHORT_LABELS[name])}</th>`; });
+    thead += '</tr></thead>';
+
+    let tbody = '<tbody>';
+    if (!rows.length){
+      tbody += `<tr><td colspan="${2 + state.items.length + ACCESS_RULE_NAMES_CLIENT.length}" class="admin-hint">لا يوجد أحد في تبويب Contacts (العمودان J/K) بعد.</td></tr>`;
+    }
+    rows.forEach(row => {
+      tbody += `<tr${row.known ? '' : ' class="admin-matrix-unknown"'}>` +
+        `<td class="admin-matrix-sticky">${escHtml(row.name)}</td>` +
+        `<td class="admin-matrix-sticky admin-matrix-email">${escHtml(row.email)}</td>`;
+      state.items.forEach((it, i) => {
+        const checked = emailInList(it.allowed, row.email) ? 'checked' : '';
+        tbody += `<td><input type="checkbox" data-matrix-item="${i}" data-matrix-email="${escHtml(row.email)}" ${checked}/></td>`;
+      });
+      ACCESS_RULE_NAMES_CLIENT.forEach(name => {
+        const rule = state.accessRules[name] || { allowed: [] };
+        const checked = emailInList(rule.allowed, row.email) ? 'checked' : '';
+        tbody += `<td><input type="checkbox" data-matrix-rule="${name}" data-matrix-email="${escHtml(row.email)}" ${checked}/></td>`;
+      });
+      tbody += '</tr>';
+    });
+    tbody += '</tbody>';
+    matrixTable.innerHTML = thead + tbody;
+  }
+
+  matrixTable.addEventListener('change', (e) => {
+    const cb = e.target;
+    if (cb.tagName !== 'INPUT' || cb.type !== 'checkbox') return;
+    const email = cb.dataset.matrixEmail;
+    if (cb.dataset.matrixItem !== undefined && cb.dataset.matrixItem !== ''){
+      const item = state.items[parseInt(cb.dataset.matrixItem, 10)];
+      if (item) toggleAllowed(item, email, cb.checked);
+    } else if (cb.dataset.matrixRule){
+      state.accessRules[cb.dataset.matrixRule] = state.accessRules[cb.dataset.matrixRule] || { public: false, allowed: [] };
+      toggleAllowed(state.accessRules[cb.dataset.matrixRule], email, cb.checked);
+    }
+    markDirty();
+    // Keep the items/access previews in sync so switching tabs shows
+    // the up-to-date chip list without needing a reload.
+    renderItemsList();
+    renderAccessRules();
+  });
+
+  // ---------- Load / Save All ----------
+  function renderAll(){
+    renderItemsList();
+    renderAccessRules();
+    renderMatrix();
+    renderAddForm();
+  }
+
+  function loadAll(onDone){
+    serverRun
+      .withSuccessHandler(res => {
+        state = { items: res.items || [], accessRules: res.accessRules || {}, directory: res.directory || [] };
+        clearDirty();
+        renderAll();
+        if (onDone) onDone();
+      })
+      .withFailureHandler(err => showMsg(itemsMsg, String(err && err.message || err), false))
+      .getAdminPanelData(adminPin);
+  }
+
+  saveAllBtn.addEventListener('click', () => {
+    const payload = { items: state.items, accessRules: state.accessRules };
+    serverRun
+      .withSuccessHandler(() => { showMsg(saveMsg, 'تم حفظ جميع التغييرات بنجاح.', true); clearDirty(); })
+      .withFailureHandler(err => showMsg(saveMsg, String(err && err.message || err), false))
+      .saveAllAdmin(adminPin, payload);
+  });
+
+  document.getElementById('adminPanelTrigger').addEventListener('click', () => {
+    overlay.classList.add('open');
+    if (adminPin){
+      pinScreen.style.display = 'none';
+      itemsScreen.style.display = '';
+      loadAll();
+    } else {
+      pinScreen.style.display = '';
+      itemsScreen.style.display = 'none';
+      pinInput.value = '';
+      pinInput.focus();
+      showMsg(pinError, '', false);
+    }
+  });
+  document.getElementById('adminModalClose').addEventListener('click', () => {
+    if (isDirty && !confirm('يوجد تغييرات غير محفوظة. إغلاق بدون حفظ؟')) return;
+    overlay.classList.remove('open');
+  });
+  overlay.addEventListener('click', (e) => {
+    if (e.target !== overlay) return;
+    if (isDirty && !confirm('يوجد تغييرات غير محفوظة. إغلاق بدون حفظ؟')) return;
+    overlay.classList.remove('open');
+  });
+
+  function submitPin(){
+    const pin = pinInput.value.trim();
+    if (!pin){ showMsg(pinError, 'أدخل رمز الدخول.', false); return; }
+    adminPin = pin;
+    serverRun
+      .withSuccessHandler(res => {
+        pinScreen.style.display = 'none';
+        itemsScreen.style.display = '';
+        state = { items: res.items || [], accessRules: res.accessRules || {}, directory: res.directory || [] };
+        clearDirty();
+        renderAll();
+        switchAdminTab('items');
+      })
+      .withFailureHandler(err => { adminPin = ''; showMsg(pinError, String(err && err.message || err), false); })
+      .getAdminPanelData(pin);
+  }
+  document.getElementById('adminPinSubmit').addEventListener('click', submitPin);
+  pinInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') submitPin(); });
+})();
+
+// Everything is defined — start: sign in (if needed), fetch this
+// user's data, then build the page.
+boot();
+</script>
+<!-- Google's sign-in library. Loaded last, after onGisLoaded() exists. -->
+<script src="https://accounts.google.com/gsi/client" async onload="onGisLoaded()" onerror="onGisFailed()"></script>
+</body></html>
