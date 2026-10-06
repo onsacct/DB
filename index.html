@@ -33,7 +33,9 @@
   .wrap{margin:0 auto; padding:0 0 24px; width:100%; flex:1; display:flex; flex-direction:column;}
   /* Content is limited to a comfortable reading width on large screens;
      the green header band still runs edge to edge. */
-  :root{--content-max:1100px;}
+  /* Content uses the whole screen width (minus the side gutter) up to
+     1680px, so desktop screens don't get wide empty strips on each side. */
+  :root{--content-max:1680px;}
   .wrap > *:not(header){width:100%; max-width:var(--content-max); margin-inline:auto; box-sizing:border-box;}
   .header-inner{max-width:var(--content-max); margin-inline:auto;}
   /* "النماذج وجداول البيانات" sits outside the padded dashboard sections,
