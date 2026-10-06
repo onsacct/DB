@@ -928,7 +928,10 @@ async function callApi(action, args){
     res = await postApi(action, args);
   }
   if (!res.ok){
-    throw new Error((res.error || 'حدث خطأ غير معروف.') + (res.detail ? ' (' + res.detail + ')' : ''));
+    const err = new Error((res.error || 'حدث خطأ غير معروف.') + (res.detail ? ' (' + res.detail + ')' : ''));
+    err.code = res.code || '';
+    err.email = res.email || '';
+    throw err;
   }
   return res.result;
 }
@@ -978,6 +981,13 @@ async function boot(){
     startApp();
     hideGate();
   } catch(err){
+    if (err && err.code === 'NOT_ALLOWED') {
+      // Signed in fine, but this email isn't on any list — no retry,
+      // only the option to sign in with a different account.
+      document.getElementById('retryBtn').style.display = 'none';
+      showGate('error', 'هذا الحساب (' + (err.email || '') + ') غير مسجّل في السِجل. إذا كان لديك حساب آخر مسجّل، اضغط «تبديل الحساب».');
+      return;
+    }
     showGate('error', String((err && err.message) || err));
   }
 }
@@ -2241,7 +2251,7 @@ function startApp(){
     { key: 'name', label: 'الاسم', type: 'text', full: true },
     { key: 'type', label: 'النوع (form / spreadsheet)', type: 'text' },
     { key: 'link', label: 'الرابط', type: 'text', full: true },
-    { key: 'public', label: 'عام (يراه الجميع)', type: 'checkbox' }
+    { key: 'public', label: 'عام (يراه كل المسجّلين)', type: 'checkbox' }
   ];
   const ACCESS_RULE_NAMES_CLIENT = ['attendanceDashboard', 'studentStats', 'contactActions'];
   const ACCESS_RULE_LABELS = {
@@ -2418,7 +2428,7 @@ function startApp(){
             <div class="admin-access-name">${ACCESS_RULE_LABELS[name]}</div>
             <div class="admin-field admin-field-public">
               <input type="checkbox" id="rule_${name}_public" data-rule="${name}" ${rule.public ? 'checked' : ''}/>
-              <label for="rule_${name}_public" style="margin:0;">عام (يراه الجميع بلا قيود)</label>
+              <label for="rule_${name}_public" style="margin:0;">عام (يراه كل المسجّلين)</label>
             </div>
             <label>مسموح له حالياً</label>
             <div>${renderAllowedPreview(rule.allowed)}</div>
