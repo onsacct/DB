@@ -466,8 +466,45 @@
     position:sticky; bottom:-16px; margin:14px -16px -16px; padding:10px 16px; background:var(--paper);
     border-top:1px solid var(--line); display:flex; align-items:center; justify-content:flex-end; gap:10px;
   }
-  .admin-save-bar .admin-error, .admin-save-bar .admin-success{margin:0; flex:1;}
+  .admin-save-bar{flex-wrap:wrap;}
+  .admin-save-bar .admin-error, .admin-save-bar .admin-success{margin:0; flex:1 1 100%; order:-1; max-height:30vh; overflow-y:auto; overflow-wrap:anywhere; line-height:1.7;}
   #adminSaveAllBtn.admin-dirty{background:var(--gold); border-color:var(--gold); color:var(--ink);}
+
+  /* Admins tab + level locks */
+  .admin-modal select{
+    appearance:auto; -webkit-appearance:auto; background:#fff; color:var(--ink); border:1px solid var(--line);
+    border-radius:6px; padding:6px 8px; font-family:'Tajawal', sans-serif; font-size:13px; font-weight:500; box-shadow:none;
+  }
+  .admin-admin-row{display:flex; align-items:center; gap:8px; flex-wrap:wrap; padding:8px 10px; border:1px solid var(--line); border-radius:8px; background:#fff; margin-bottom:6px;}
+  .admin-admin-who{flex:1 1 180px; min-width:0;}
+  .admin-admin-who .n{font-weight:700; font-size:13px; color:var(--ink);}
+  .admin-admin-who .e{font-size:11.5px; color:var(--ink-soft); direction:ltr; text-align:right; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .admin-admin-you{font-size:10.5px; font-weight:700; color:var(--green); background:rgba(31,59,50,0.08); border-radius:10px; padding:1px 7px; margin-inline-start:4px;}
+  .admin-remove-btn{background:#fff; border:1px solid #fecaca; color:#9b2c2c; border-radius:6px; padding:5px 10px; cursor:pointer; font-family:'Tajawal', sans-serif; font-size:12px; font-weight:700;}
+  .admin-remove-btn:hover{background:#fee2e2;}
+  .admin-add-admin{display:flex; gap:6px; flex-wrap:wrap; margin-top:10px;}
+  .admin-add-admin input{flex:1 1 220px; min-width:0; box-sizing:border-box; font-family:'Tajawal', sans-serif; font-size:13.5px; padding:8px 10px; border:1px solid var(--line); border-radius:6px; color:var(--ink); background:#fff;}
+  .admin-add-admin input:focus{outline:none; border-color:var(--gold);}
+  .admin-level-note{background:#fff7ed; border:1px solid #fed7aa; color:#7c2d12; border-radius:6px; padding:8px 10px;}
+  table.admin-matrix input[type=checkbox]:disabled{cursor:not-allowed; opacity:.45;}
+  table.admin-matrix th.admin-matrix-locked{color:var(--ink-soft);}
+
+  /* Sharing tab + report after saving */
+  #adminCheckSharingBtn{margin-bottom:10px;}
+  .admin-share-card{border:1px solid var(--line); border-radius:8px; background:#fff; padding:10px 12px; margin-bottom:8px;}
+  .admin-share-head{display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:4px;}
+  .admin-share-head b{font-size:13.5px; color:var(--ink); flex:1 1 160px;}
+  .admin-share-type{font-size:11px; font-weight:700; border-radius:10px; padding:2px 8px; background:var(--paper-deep); color:var(--ink-soft);}
+  .admin-share-ok{color:#166534; font-size:12.5px;}
+  .admin-share-row{margin-top:6px; font-size:12.5px; color:var(--ink);}
+  .admin-share-row .admin-chip{direction:ltr;}
+  .admin-share-row button{margin-top:6px;}
+  .admin-share-warn{color:#9a3412;}
+  .admin-share-err{color:#9b2c2c; font-size:12.5px;}
+  .admin-share-report{border:1px solid var(--line); border-radius:8px; background:#fff; padding:10px 12px; margin-top:12px; font-size:12.5px; line-height:1.7;}
+  .admin-share-report ul{margin:4px 0 6px; padding-inline-start:18px;}
+  .admin-btn-small{font-size:12px; padding:5px 12px;}
+  .admin-btn-danger{background:#fff; border-color:#fecaca; color:#9b2c2c;}
 
   @media (max-width:768px){
     header{height:auto; min-height:56px; padding-top:8px; padding-bottom:8px;}
@@ -718,16 +755,13 @@
 <main id="pages"></main>
 </div>
 </div>
-<footer>دليل داخلي لتنظيم النماذج والسجلات<br/><button type="button" id="adminPanelTrigger">⚙ لوحة التحكم</button><div class="server-version" id="serverVersionNote"></div></footer>
+<footer>دليل تنظيم النماذج والسجلات<br/><button type="button" id="adminPanelTrigger" style="display:none;">⚙ لوحة التحكم</button><div class="server-version" id="serverVersionNote"></div></footer>
 </div>
 
-<!-- Admin control panel: add/update catalog items & their allowed
-     emails, gated by a shared PIN (checked again server-side on every
-     save — see ITEMS_ADMIN_PIN in Code.gs). The trigger link above is
-     always visible to any visitor, in the normal page flow (not
-     position:fixed, which some mobile browsers render unreliably); it
-     just opens a PIN prompt, nothing readable until the right PIN is
-     entered. -->
+<!-- Control panel. The ⚙ button above is shown only to emails on the
+     "Admins" list (Level 1–3), and the server re-checks the signed-in
+     email's level on every action — hiding the button is only a
+     convenience, not the protection. -->
 <div id="adminPanelOverlay" class="admin-overlay">
   <div class="admin-modal">
     <div class="admin-modal-head">
@@ -736,21 +770,20 @@
     </div>
     <div class="admin-modal-body">
 
-      <div id="adminPinScreen">
-        <p class="admin-hint">أدخل رمز الدخول لإدارة الأصناف.</p>
-        <input type="password" id="adminPinInput" class="admin-pin-input" placeholder="رمز الدخول" inputmode="numeric" autocomplete="off"/>
-        <div id="adminPinError" class="admin-error" style="display:none;"></div>
-        <button type="button" id="adminPinSubmit" class="admin-btn admin-btn-primary">دخول</button>
-      </div>
+      <div id="adminLoading" class="admin-hint" style="display:none;">جارٍ التحميل…</div>
+      <div id="adminLoadError" class="admin-error" style="display:none;"></div>
 
       <div id="adminItemsScreen" style="display:none;">
         <div class="admin-tabs">
           <button type="button" class="admin-tab-btn active" data-admin-tab="items">الأصناف</button>
           <button type="button" class="admin-tab-btn" data-admin-tab="access">الصلاحيات</button>
+          <button type="button" class="admin-tab-btn" data-admin-tab="sharing">المشاركة</button>
+          <button type="button" class="admin-tab-btn" data-admin-tab="admins" id="adminTabBtnAdmins" style="display:none;">المشرفون</button>
         </div>
         <div id="adminItemsMsg" class="admin-error" style="display:none;"></div>
 
         <div id="adminTabItems" class="admin-tab-panel">
+          <p class="admin-hint admin-level-note" id="adminLevel3Note" style="display:none;">🔒 المستوى ٣: يمكنك تعديل الأصناف الحالية وصلاحياتها، لكن لا يمكنك إضافة أصناف جديدة ولا تعديل صلاحية التواصل (اتصال / واتساب).</p>
           <details class="admin-add-card" id="adminAddCard">
             <summary>➕ إضافة صنف جديد</summary>
             <div class="admin-form" id="adminAddForm" data-mode="new"></div>
@@ -768,6 +801,42 @@
             <table class="admin-matrix" id="adminMatrixTable"></table>
           </div>
         </div>
+
+        <div id="adminTabSharing" class="admin-tab-panel" style="display:none;">
+          <div class="admin-hint admin-access-note">
+            الموقع يعرض للشخص <b>رابط</b> الصنف فقط. إذا كان الرابط جدول Google، يجب أن يُشارَك <b>الملف نفسه</b> معه، وإلا سيرفض Google فتحه.<br/>
+            • عند «حفظ كل التغييرات» يُشارَك الجدول تلقائياً مع من أضفته إليه، حسب «مشاركة الملف» في إعدادات الصنف.<br/>
+            • من تُزيله لا يُلغى وصوله للملف تلقائياً — ستظهر لك قائمة لتقرر.<br/>
+            • النماذج (Forms) لا تحتاج مشاركة للإجابة عليها. ولوحات الحضور والإحصاءات وأزرار التواصل والمشرفون لا يحتاجون أي مشاركة.
+          </div>
+          <button type="button" id="adminCheckSharingBtn" class="admin-btn admin-btn-primary">🔍 فحص مشاركة الملفات</button>
+          <div id="adminSharingResults"></div>
+        </div>
+
+        <div id="adminTabAdmins" class="admin-tab-panel" style="display:none;">
+          <div class="admin-hint admin-access-note">
+            <b>مستويات المشرفين:</b><br/>
+            <b>المستوى ١</b> — كل صلاحيات لوحة التحكم، وإضافة المشرفين وتغيير مستوياتهم وإزالتهم.<br/>
+            <b>المستوى ٢</b> — كل صلاحيات لوحة التحكم عدا إدارة المشرفين.<br/>
+            <b>المستوى ٣</b> — تعديل الأصناف الحالية وصلاحياتها فقط؛ لا يضيف أصنافاً جديدة ولا يعدّل صلاحية التواصل (اتصال / واتساب).<br/>
+            يجب أن يبقى مشرف واحد على الأقل من المستوى ١.<br/>
+            المشرفون لا يحتاجون أي مشاركة لجداول Google.
+          </div>
+          <div id="adminAdminsList"></div>
+          <div class="admin-add-admin">
+            <input type="email" id="newAdminEmail" list="adminDirectoryList" placeholder="البريد الإلكتروني للمشرف الجديد" dir="ltr" autocomplete="off"/>
+            <select id="newAdminLevel" aria-label="المستوى">
+              <option value="1">المستوى ١</option>
+              <option value="2">المستوى ٢</option>
+              <option value="3" selected>المستوى ٣</option>
+            </select>
+            <button type="button" id="adminAddAdminBtn" class="admin-btn admin-btn-primary">إضافة مشرف</button>
+          </div>
+          <datalist id="adminDirectoryList"></datalist>
+          <p class="admin-hint" style="margin-top:8px;">التغييرات هنا تُحفظ مع زر «حفظ كل التغييرات».</p>
+        </div>
+
+        <div id="adminShareReport" class="admin-share-report" style="display:none;"></div>
 
         <div class="admin-save-bar">
           <div id="adminSaveMsg" class="admin-error" style="display:none;"></div>
@@ -987,6 +1056,8 @@ async function boot(){
     const res = await callApi('getPageData', []);
     SERVER_DATA = res.data;
     document.getElementById('userEmailMeta').textContent = res.email;
+    // The ⚙ control-panel button is shown only to admins (Level 1–3).
+    if (res.adminLevel) document.getElementById('adminPanelTrigger').style.display = '';
     // Which Code.gs is live. An old Code.gs doesn't send serverVersion
     // at all — say so loudly, since that means the latest backend rules
     // (like blocking unlisted emails) aren't running yet.
@@ -2240,28 +2311,18 @@ function startApp(){
 }
 
 // ============================================================
-// Admin control panel. Gated by a shared PIN — see ITEMS_ADMIN_PIN in
-// Code.gs. The PIN is kept only in this page's memory (never
-// localStorage), and is sent again with every call so the server can
-// re-check it — this client-side gate is just convenience, not the
-// real security boundary.
+// Control panel. Only emails on the "Admins" list see the ⚙ button
+// (boot() shows it when the server reports adminLevel 1–3), and the
+// server checks the signed-in email's level on EVERY action:
+//   Level 1 — everything + the "المشرفون" (admins) tab
+//   Level 2 — everything except managing admins
+//   Level 3 — no "add new item", contact-buttons column locked
+// What's hidden or locked here just mirrors those server rules.
 //
-// Design: everything loaded from the server (items, access rules, the
-// Name/Email directory) lives in one in-memory `state` object. Every
-// field edit, checkbox toggle, or Permissions-matrix tick just mutates
-// `state` directly — NOTHING is sent to the server until "حفظ كل
-// التغييرات" is clicked, which sends the whole state in ONE
-// saveAllAdmin() call. The only exception is adding a brand-new item,
-// which still saves immediately (it needs a server-confirmed row
-// before it can appear as a matrix column).
-//
-// "Allowed" email lists are no longer free-text here at all — they're
-// edited ONLY from the Permissions matrix tab, by ticking a checkbox
-// against a person pulled from the Main spreadsheet's "Contacts" tab,
-// columns J (name) / K (email). The item/access-rule cards show that
-// list as a read-only preview (resolved to names where possible) so
-// nobody can introduce a typo'd email that quietly never matches
-// anyone.
+// Everything loaded from the server lives in one `state` object; edits
+// only change `state` until "حفظ كل التغييرات" sends it all in ONE call.
+// Adding a brand-new item still saves immediately (it needs a
+// server-confirmed row before it can appear as a matrix column).
 // ============================================================
 (function(){
   const ADMIN_FIELDS = [
@@ -2270,8 +2331,11 @@ function startApp(){
     { key: 'name', label: 'الاسم', type: 'text', full: true },
     { key: 'type', label: 'النوع (form / spreadsheet)', type: 'text' },
     { key: 'link', label: 'الرابط', type: 'text', full: true },
-    { key: 'public', label: 'عام (يراه كل المسجّلين)', type: 'checkbox' }
+    { key: 'public', label: 'عام (يراه كل المسجّلين)', type: 'checkbox' },
+    { key: 'shareAs', label: 'مشاركة الملف (لروابط جداول Google فقط)', type: 'select', def: 'viewer',
+      options: [['viewer', 'مشاهدة'], ['editor', 'تعديل'], ['none', 'بدون مشاركة تلقائية']] }
   ];
+  const SHARE_LABELS = { viewer: 'مشاهدة', editor: 'تعديل', none: 'بدون مشاركة تلقائية' };
   const ACCESS_RULE_NAMES_CLIENT = ['attendanceDashboard', 'studentStats', 'contactActions'];
   const ACCESS_RULE_LABELS = {
     attendanceDashboard: 'لوحة الحضور الأسبوعية',
@@ -2283,18 +2347,16 @@ function startApp(){
     studentStats: 'الإحصاءات',
     contactActions: 'التواصل'
   };
+  const LEVEL_LABELS = { 1: 'المستوى ١', 2: 'المستوى ٢', 3: 'المستوى ٣' };
 
-  let adminPin = '';
   let isDirty = false;
-  // Everything the panel works with, loaded in one shot by loadAll()
-  // and mutated in place by every edit until "حفظ كل التغييرات".
-  let state = { items: [], accessRules: {}, directory: [] };
+  let state = { items: [], accessRules: {}, directory: [], admins: [], myLevel: 0, myEmail: '' };
+  let currentTab = 'items';
 
   const overlay = document.getElementById('adminPanelOverlay');
-  const pinScreen = document.getElementById('adminPinScreen');
+  const loadingEl = document.getElementById('adminLoading');
+  const loadErrorEl = document.getElementById('adminLoadError');
   const itemsScreen = document.getElementById('adminItemsScreen');
-  const pinInput = document.getElementById('adminPinInput');
-  const pinError = document.getElementById('adminPinError');
   const itemsMsg = document.getElementById('adminItemsMsg');
   const saveMsg = document.getElementById('adminSaveMsg');
   const itemsList = document.getElementById('adminItemsList');
@@ -2302,9 +2364,19 @@ function startApp(){
   const accessRulesEl = document.getElementById('adminAccessRules');
   const matrixTable = document.getElementById('adminMatrixTable');
   const saveAllBtn = document.getElementById('adminSaveAllBtn');
+  const adminsListEl = document.getElementById('adminAdminsList');
+
+  // What the signed-in admin may do (mirrors the server's rules).
+  const can = {
+    addItems: () => state.myLevel === 1 || state.myLevel === 2,
+    editContactRule: () => state.myLevel === 1 || state.myLevel === 2,
+    manageAdmins: () => state.myLevel === 1,
+    changeShareAs: () => state.myLevel === 1 || state.myLevel === 2
+  };
 
   function showMsg(el, text, ok){
     el.textContent = text;
+    el.style.whiteSpace = 'pre-line';
     el.className = ok ? 'admin-success' : 'admin-error';
     el.style.display = text ? 'block' : 'none';
   }
@@ -2323,16 +2395,18 @@ function startApp(){
   }
 
   function switchAdminTab(tab){
+    if (tab === 'admins' && !can.manageAdmins()) tab = 'items';
+    currentTab = tab;
     document.querySelectorAll('.admin-tab-btn').forEach(b => b.classList.toggle('active', b.dataset.adminTab === tab));
     document.getElementById('adminTabItems').style.display = tab === 'items' ? '' : 'none';
     document.getElementById('adminTabAccess').style.display = tab === 'access' ? '' : 'none';
+    document.getElementById('adminTabSharing').style.display = tab === 'sharing' ? '' : 'none';
+    document.getElementById('adminTabAdmins').style.display = tab === 'admins' ? '' : 'none';
   }
   document.querySelectorAll('.admin-tab-btn').forEach(b => {
     b.addEventListener('click', () => switchAdminTab(b.dataset.adminTab));
   });
 
-  // Resolves an email to the matching directory name for display, or
-  // just shows the raw email if nobody in Contacts J/K matches it.
   function resolveChipLabel(email){
     const norm = String(email || '').trim().toLowerCase();
     const match = state.directory.find(d => String(d.email || '').trim().toLowerCase() === norm);
@@ -2355,8 +2429,16 @@ function startApp(){
   }
 
   // ---------- Items tab ----------
+  function selectHtml(field, value, attrs){
+    const v = value || field.def;
+    return `<select ${attrs}>${field.options.map(([val, lab]) => `<option value="${val}" ${val === v ? 'selected' : ''}>${lab}</option>`).join('')}</select>`;
+  }
   function fieldHtml(field, value, idx){
     const id = 'item_' + idx + '_' + field.key;
+    if (field.type === 'select'){
+      const locked = field.key === 'shareAs' && !can.changeShareAs();
+      return `<div class="admin-field"><label for="${id}">${field.label}${locked ? ' 🔒' : ''}</label>${selectHtml(field, value, `id="${id}" data-idx="${idx}" data-key="${field.key}" ${locked ? 'disabled' : ''}`)}</div>`;
+    }
     if (field.type === 'checkbox'){
       return `<div class="admin-field admin-field-public"><input type="checkbox" id="${id}" data-idx="${idx}" data-key="${field.key}" ${value ? 'checked' : ''}/><label for="${id}" style="margin:0;">${field.label}</label></div>`;
     }
@@ -2393,10 +2475,12 @@ function startApp(){
     if (e.target.closest('[data-goto-permissions]')) switchAdminTab('access');
   });
 
-  // ---------- "Add new item" — still an immediate save (needs a
-  // server-confirmed id before it can be a matrix column) ----------
+  // ---------- "Add new item" (Levels 1 & 2) ----------
   function addFieldHtml(field){
     const id = 'new_' + field.key;
+    if (field.type === 'select'){
+      return `<div class="admin-field"><label for="${id}">${field.label}</label>${selectHtml(field, '', `id="${id}"`)}</div>`;
+    }
     if (field.type === 'checkbox'){
       return `<div class="admin-field admin-field-public"><input type="checkbox" id="${id}"/><label for="${id}" style="margin:0;">${field.label}</label></div>`;
     }
@@ -2414,9 +2498,10 @@ function startApp(){
     const checked = k => { const el = document.getElementById('new_' + k); return el ? el.checked : false; };
     const id = (document.getElementById('new_id').value || '').trim();
     if (!id){ showMsg(itemsMsg, 'يجب إدخال المعرّف (id).', false); return; }
+    if (state.items.some(it => it.id === id)){ showMsg(itemsMsg, 'هذا المعرّف مستخدم لصنف آخر.', false); return; }
     const newItem = {
       id: id, catAr: val('catAr'), catEn: val('catEn'), name: val('name'),
-      type: val('type'), link: val('link'), public: checked('public'), allowed: []
+      type: val('type'), link: val('link'), public: checked('public'), allowed: [], shareAs: val('shareAs')
     };
     serverRun
       .withSuccessHandler(() => {
@@ -2428,27 +2513,26 @@ function startApp(){
         renderAddForm();
       })
       .withFailureHandler(err => showMsg(itemsMsg, String(err && err.message || err), false))
-      .saveItemAdmin(adminPin, Object.assign({}, newItem, { allowed: '' }));
+      .saveItemAdmin(Object.assign({}, newItem, { allowed: '' }));
   });
 
   // ---------- Access rules (public toggle + read-only preview) ----------
   function renderAccessRules(){
     accessRulesEl.innerHTML = `
       <p class="admin-hint admin-access-note">
-        تذكير: أي بريد يُفعَّل في أحد الأقسام الثلاثة أدناه يحتاج أيضاً صلاحية Google مباشرة
-        على جدول البيانات الرئيسي (Main) — Viewer لـ"الحضور" و"الإحصاءات"، أو Editor لـ"التواصل" —
-        وإلا ستفشل قراءته رغم تفعيله هنا. تبويبا "الأصناف" و"الصلاحيات" نفساهما مُشارَكان تلقائياً
-        مع أي شخص لديه الرابط، فلا حاجة لمشاركتهما يدوياً مع أحد.
+        يكفي أن يُفعَّل البريد هنا أو في المصفوفة أدناه — لا يحتاج الشخص أي مشاركة مباشرة لجداول Google.
       </p>` +
       ACCESS_RULE_NAMES_CLIENT.map(name => {
         const rule = state.accessRules[name] || { public: false, allowed: [] };
+        const locked = name === 'contactActions' && !can.editContactRule();
         return `
           <div class="admin-access-card">
-            <div class="admin-access-name">${ACCESS_RULE_LABELS[name]}</div>
+            <div class="admin-access-name">${ACCESS_RULE_LABELS[name]}${locked ? ' 🔒' : ''}</div>
             <div class="admin-field admin-field-public">
-              <input type="checkbox" id="rule_${name}_public" data-rule="${name}" ${rule.public ? 'checked' : ''}/>
+              <input type="checkbox" id="rule_${name}_public" data-rule="${name}" ${rule.public ? 'checked' : ''} ${locked ? 'disabled' : ''}/>
               <label for="rule_${name}_public" style="margin:0;">عام (يراه كل المسجّلين)</label>
             </div>
+            ${locked ? '<p class="admin-hint" style="margin:4px 0;">لا يمكن للمستوى ٣ تعديل هذه الصلاحية.</p>' : ''}
             <label>مسموح له حالياً</label>
             <div>${renderAllowedPreview(rule.allowed)}</div>
           </div>`;
@@ -2457,6 +2541,7 @@ function startApp(){
   accessRulesEl.addEventListener('change', (e) => {
     const el = e.target;
     if (!el.dataset.rule) return;
+    if (el.dataset.rule === 'contactActions' && !can.editContactRule()) { el.checked = !el.checked; return; }
     state.accessRules[el.dataset.rule] = state.accessRules[el.dataset.rule] || { public: false, allowed: [] };
     state.accessRules[el.dataset.rule].public = el.checked;
     markDirty();
@@ -2484,9 +2569,13 @@ function startApp(){
 
   function renderMatrix(){
     const rows = buildMatrixRows();
+    const contactLocked = !can.editContactRule();
     let thead = '<thead><tr><th class="admin-matrix-sticky">الشخص</th>';
     state.items.forEach((it, i) => { thead += `<th class="admin-matrix-head-wrap" title="${escHtml(it.name)}">${escHtml(it.name || it.id)}</th>`; });
-    ACCESS_RULE_NAMES_CLIENT.forEach(name => { thead += `<th title="${escHtml(ACCESS_RULE_LABELS[name])}">${escHtml(ACCESS_RULE_SHORT_LABELS[name])}</th>`; });
+    ACCESS_RULE_NAMES_CLIENT.forEach(name => {
+      const locked = name === 'contactActions' && contactLocked;
+      thead += `<th${locked ? ' class="admin-matrix-locked"' : ''} title="${escHtml(ACCESS_RULE_LABELS[name])}">${escHtml(ACCESS_RULE_SHORT_LABELS[name])}${locked ? ' 🔒' : ''}</th>`;
+    });
     thead += '</tr></thead>';
 
     let tbody = '<tbody>';
@@ -2503,7 +2592,8 @@ function startApp(){
       ACCESS_RULE_NAMES_CLIENT.forEach(name => {
         const rule = state.accessRules[name] || { allowed: [] };
         const checked = emailInList(rule.allowed, row.email) ? 'checked' : '';
-        tbody += `<td><input type="checkbox" data-matrix-rule="${name}" data-matrix-email="${escHtml(row.email)}" title="${escHtml(row.name)} — ${escHtml(ACCESS_RULE_LABELS[name])}" aria-label="${escHtml(row.name)} — ${escHtml(ACCESS_RULE_LABELS[name])}" ${checked}/></td>`;
+        const locked = name === 'contactActions' && contactLocked;
+        tbody += `<td><input type="checkbox" data-matrix-rule="${name}" data-matrix-email="${escHtml(row.email)}" title="${escHtml(row.name)} — ${escHtml(ACCESS_RULE_LABELS[name])}" aria-label="${escHtml(row.name)} — ${escHtml(ACCESS_RULE_LABELS[name])}" ${checked} ${locked ? 'disabled' : ''}/></td>`;
       });
       tbody += '</tr>';
     });
@@ -2519,34 +2609,219 @@ function startApp(){
       const item = state.items[parseInt(cb.dataset.matrixItem, 10)];
       if (item) toggleAllowed(item, email, cb.checked);
     } else if (cb.dataset.matrixRule){
+      if (cb.dataset.matrixRule === 'contactActions' && !can.editContactRule()) { cb.checked = !cb.checked; return; }
       state.accessRules[cb.dataset.matrixRule] = state.accessRules[cb.dataset.matrixRule] || { public: false, allowed: [] };
       toggleAllowed(state.accessRules[cb.dataset.matrixRule], email, cb.checked);
     }
     markDirty();
-    // Keep the items/access previews in sync so switching tabs shows
-    // the up-to-date chip list without needing a reload.
     renderItemsList();
     renderAccessRules();
   });
 
-  // ---------- Load / Save All ----------
+  // ---------- Admins tab (Level 1 only) ----------
+  function adminNameFor(email){
+    const d = state.directory.find(x => String(x.email || '').trim().toLowerCase() === email);
+    return d ? d.name : '';
+  }
+  function renderAdmins(){
+    if (!can.manageAdmins()) { adminsListEl.innerHTML = ''; return; }
+    adminsListEl.innerHTML = state.admins.map((a, i) => {
+      const name = adminNameFor(a.email);
+      const you = a.email === state.myEmail ? '<span class="admin-admin-you">أنت</span>' : '';
+      const options = [1, 2, 3].map(l => `<option value="${l}" ${a.level === l ? 'selected' : ''}>${LEVEL_LABELS[l]}</option>`).join('');
+      return `
+        <div class="admin-admin-row">
+          <div class="admin-admin-who">
+            <div class="n">${escHtml(name || a.email)}${you}</div>
+            ${name ? `<div class="e">${escHtml(a.email)}</div>` : ''}
+          </div>
+          <select data-admin-idx="${i}" aria-label="مستوى ${escHtml(name || a.email)}">${options}</select>
+          <button type="button" class="admin-remove-btn" data-admin-remove="${i}">إزالة</button>
+        </div>`;
+    }).join('') || '<p class="admin-hint">لا يوجد مشرفون.</p>';
+    document.getElementById('adminDirectoryList').innerHTML = state.directory
+      .filter(d => !state.admins.some(a => a.email === String(d.email).trim().toLowerCase()))
+      .map(d => `<option value="${escHtml(String(d.email).trim().toLowerCase())}">${escHtml(d.name)}</option>`).join('');
+  }
+  function hasLevel1(list){ return list.some(a => a.level === 1); }
+
+  adminsListEl.addEventListener('change', (e) => {
+    const sel = e.target.closest('select[data-admin-idx]');
+    if (!sel) return;
+    const i = parseInt(sel.dataset.adminIdx, 10);
+    const next = state.admins.map((a, j) => j === i ? { email: a.email, level: Number(sel.value) } : a);
+    if (!hasLevel1(next)) {
+      showMsg(saveMsg, 'يجب أن يبقى مشرف واحد على الأقل من المستوى ١.', false);
+      sel.value = String(state.admins[i].level);
+      return;
+    }
+    state.admins = next;
+    showMsg(saveMsg, '', false);
+    markDirty();
+  });
+  adminsListEl.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-admin-remove]');
+    if (!btn) return;
+    const i = parseInt(btn.dataset.adminRemove, 10);
+    const next = state.admins.filter((_, j) => j !== i);
+    if (!hasLevel1(next)) { showMsg(saveMsg, 'يجب أن يبقى مشرف واحد على الأقل من المستوى ١.', false); return; }
+    state.admins = next;
+    showMsg(saveMsg, '', false);
+    markDirty();
+    renderAdmins();
+  });
+  document.getElementById('adminAddAdminBtn').addEventListener('click', () => {
+    const input = document.getElementById('newAdminEmail');
+    const email = String(input.value || '').trim().toLowerCase();
+    const level = Number(document.getElementById('newAdminLevel').value);
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showMsg(saveMsg, 'أدخل بريداً إلكترونياً صحيحاً.', false); return; }
+    if (state.admins.some(a => a.email === email)) { showMsg(saveMsg, 'هذا البريد موجود في قائمة المشرفين.', false); return; }
+    state.admins.push({ email: email, level: level });
+    input.value = '';
+    showMsg(saveMsg, '', false);
+    markDirty();
+    renderAdmins();
+  });
+
+  // ---------- Google file sharing ----------
+  const sharingResultsEl = document.getElementById('adminSharingResults');
+  const shareReportEl = document.getElementById('adminShareReport');
+  const chips = list => list.map(e => `<span class="admin-chip" title="${escHtml(e)}">${escHtml(resolveChipLabel(e))}</span>`).join(' ');
+
+  function renderSharingStatus(list){
+    if (!list.length) { sharingResultsEl.innerHTML = '<p class="admin-hint">لا توجد أصناف مرتبطة بجداول Google.</p>'; return; }
+    const allMissing = [];
+    const cards = list.map(st => {
+      let body = '';
+      if (st.error) {
+        body = `<div class="admin-share-err">${escHtml(st.error)}</div>`;
+      } else {
+        const need = st.missing.concat(st.upgrade);
+        if (need.length && st.shareAs !== 'none') allMissing.push({ itemId: st.id, add: need });
+        if (st.missing.length) body += `<div class="admin-share-row admin-share-warn">بحاجة لمشاركة (${toArabicNum(st.missing.length)}): ${chips(st.missing)}</div>`;
+        if (st.upgrade.length) body += `<div class="admin-share-row admin-share-warn">لديهم مشاهدة ويحتاجون تعديلاً (${toArabicNum(st.upgrade.length)}): ${chips(st.upgrade)}</div>`;
+        if (need.length && st.shareAs !== 'none') body += `<div class="admin-share-row"><button type="button" class="admin-btn admin-btn-primary admin-btn-small" data-share-add="${escHtml(st.id)}">مشاركة الملف معهم (${SHARE_LABELS[st.shareAs]})</button></div>`;
+        if (need.length && st.shareAs === 'none') body += `<div class="admin-share-row admin-hint">نوع المشاركة لهذا الصنف «بدون مشاركة تلقائية» — شاركه يدوياً من Google إن لزم.</div>`;
+        if (st.extra.length) body += `<div class="admin-share-row">لديهم وصول للملف وليسوا في قائمة هذا الصنف (${toArabicNum(st.extra.length)}): ${chips(st.extra)}<br/><button type="button" class="admin-btn admin-btn-danger admin-btn-small" data-share-remove="${escHtml(st.id)}">إزالة وصولهم للملف</button></div>`;
+        if (!st.missing.length && !st.upgrade.length && !st.extra.length) body = '<div class="admin-share-ok">✓ الملف مُشارَك مع كل من في القائمة فقط.</div>';
+      }
+      return `<div class="admin-share-card" data-share-card="${escHtml(st.id)}">
+        <div class="admin-share-head"><b>${escHtml(st.name)}</b><span class="admin-share-type">${SHARE_LABELS[st.shareAs] || ''}</span></div>${body}</div>`;
+    }).join('');
+    const top = allMissing.length > 1 ? `<button type="button" class="admin-btn admin-btn-primary" id="adminShareAllBtn" style="margin-bottom:10px;">مشاركة كل الملفات الناقصة (${toArabicNum(allMissing.length)})</button>` : '';
+    sharingResultsEl.innerHTML = top + cards;
+    sharingResultsEl._status = list;
+    sharingResultsEl._allMissing = allMissing;
+  }
+
+  function checkSharing(){
+    sharingResultsEl.innerHTML = '<p class="admin-hint">جارٍ فحص الملفات… قد يستغرق ذلك نصف دقيقة.</p>';
+    serverRun
+      .withSuccessHandler(renderSharingStatus)
+      .withFailureHandler(err => { sharingResultsEl.innerHTML = `<div class="admin-error">${escHtml(String(err && err.message || err))}</div>`; })
+      .getSharingStatus();
+  }
+  document.getElementById('adminCheckSharingBtn').addEventListener('click', checkSharing);
+
+  // Groups results by file: «file»: person, person
+  function byFile(list){
+    const m = new Map();
+    (list || []).forEach(x => { if (!m.has(x.name)) m.set(x.name, []); m.get(x.name).push(x); });
+    return [...m.entries()].map(([name, xs]) => `«${name}»: ${xs.map(x => x.email ? resolveChipLabel(x.email) : x.error).join('، ')}`).join(' — ');
+  }
+  function describeApplyResult(r){
+    const parts = [];
+    if (r.shared && r.shared.length) parts.push('✓ تمت المشاركة ' + byFile(r.shared));
+    if (r.removed && r.removed.length) parts.push('✓ أُزيل الوصول ' + byFile(r.removed));
+    if (r.failed && r.failed.length) parts.push('✗ تعذّر: ' + r.failed.map(x => `«${x.name}»${x.email ? ' (' + resolveChipLabel(x.email) + ')' : ''}: ${x.error}`).join(' — '));
+    return parts.join('\n') || 'لا يوجد ما يلزم تغييره.';
+  }
+  function runApply(requests, msgEl, after){
+    serverRun
+      .withSuccessHandler(r => { showMsg(msgEl, describeApplyResult(r), !(r.failed && r.failed.length)); if (after) after(r); })
+      .withFailureHandler(err => showMsg(msgEl, String(err && err.message || err), false))
+      .applySharing(requests);
+  }
+  sharingResultsEl.addEventListener('click', (e) => {
+    const list = sharingResultsEl._status || [];
+    const addBtn = e.target.closest('[data-share-add]');
+    const remBtn = e.target.closest('[data-share-remove]');
+    if (e.target.closest('#adminShareAllBtn')) {
+      runApply(sharingResultsEl._allMissing || [], saveMsg, checkSharing);
+    } else if (addBtn) {
+      const st = list.find(x => x.id === addBtn.dataset.shareAdd);
+      if (st) runApply([{ itemId: st.id, add: st.missing.concat(st.upgrade) }], saveMsg, checkSharing);
+    } else if (remBtn) {
+      const st = list.find(x => x.id === remBtn.dataset.shareRemove);
+      if (st && confirm('إزالة وصول ' + st.extra.length + ' شخص/أشخاص إلى ملف «' + st.name + '»؟')) {
+        runApply([{ itemId: st.id, remove: st.extra }], saveMsg, checkSharing);
+      }
+    }
+  });
+
+  // Shown under the panel after "حفظ كل التغييرات".
+  function renderShareReport(rep){
+    if (!rep || (!rep.shared.length && !rep.failed.length && !rep.stillHasAccess.length)) { shareReportEl.style.display = 'none'; return; }
+    let html = '<b>مشاركة ملفات Google بعد الحفظ:</b>';
+    if (rep.shared.length) html += '<ul>' + rep.shared.map(x => `<li>✓ ${escHtml(x.name)} ← ${escHtml(resolveChipLabel(x.email))} (${SHARE_LABELS[x.as]})</li>`).join('') + '</ul>';
+    if (rep.failed.length) html += '<ul class="admin-share-err">' + rep.failed.map(x => `<li>✗ ${escHtml(x.name)}${x.email ? ' ← ' + escHtml(resolveChipLabel(x.email)) : ''}: ${escHtml(x.error)}</li>`).join('') + '</ul>';
+    rep.stillHasAccess.forEach((x, i) => {
+      html += `<div class="admin-share-row">أزلت من «${escHtml(x.name)}»، لكن ما زال لديهم وصول للملف: ${chips(x.emails)}
+        <br/><button type="button" class="admin-btn admin-btn-danger admin-btn-small" data-report-remove="${i}">إزالة وصولهم للملف</button></div>`;
+    });
+    shareReportEl.innerHTML = html;
+    shareReportEl._still = rep.stillHasAccess;
+    shareReportEl.style.display = '';
+  }
+  shareReportEl.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-report-remove]');
+    if (!btn) return;
+    const x = (shareReportEl._still || [])[parseInt(btn.dataset.reportRemove, 10)];
+    if (!x || !confirm('إزالة وصولهم إلى ملف «' + x.name + '»؟')) return;
+    runApply([{ itemId: x.itemId, remove: x.emails }], saveMsg, () => { btn.closest('.admin-share-row').remove(); });
+  });
+
+  // ---------- Load / Save ----------
+  function applyLevel(){
+    document.getElementById('adminModalTitle').textContent = 'لوحة التحكم · ' + (LEVEL_LABELS[state.myLevel] || '');
+    document.getElementById('adminAddCard').style.display = can.addItems() ? '' : 'none';
+    document.getElementById('adminLevel3Note').style.display = state.myLevel === 3 ? '' : 'none';
+    document.getElementById('adminTabBtnAdmins').style.display = can.manageAdmins() ? '' : 'none';
+  }
   function renderAll(){
+    applyLevel();
     renderItemsList();
     renderAccessRules();
     renderMatrix();
     renderAddForm();
+    renderAdmins();
+    switchAdminTab(currentTab);
   }
 
-  function loadAll(onDone){
+  function loadAll(){
+    loadingEl.style.display = '';
+    showMsg(loadErrorEl, '', false);
+    itemsScreen.style.display = 'none';
     serverRun
       .withSuccessHandler(res => {
-        state = { items: res.items || [], accessRules: res.accessRules || {}, directory: res.directory || [] };
+        state = {
+          items: res.items || [], accessRules: res.accessRules || {}, directory: res.directory || [],
+          admins: res.admins || [], myLevel: res.myLevel || 0, myEmail: res.myEmail || ''
+        };
+        loadingEl.style.display = 'none';
+        itemsScreen.style.display = '';
         clearDirty();
         renderAll();
-        if (onDone) onDone();
       })
-      .withFailureHandler(err => showMsg(itemsMsg, String(err && err.message || err), false))
-      .getAdminPanelData(adminPin);
+      .withFailureHandler(err => {
+        // e.g. this email was just removed from the admins — close and hide the button
+        loadingEl.style.display = 'none';
+        showMsg(loadErrorEl, String(err && err.message || err), false);
+        if (/صلاحية الوصول إلى لوحة التحكم/.test(String(err && err.message))) {
+          document.getElementById('adminPanelTrigger').style.display = 'none';
+        }
+      })
+      .getAdminPanelData();
   }
 
   // Clears the server's memory so the next page load reads the
@@ -2556,30 +2831,33 @@ function startApp(){
     serverRun
       .withSuccessHandler(() => showMsg(saveMsg, 'تم تحديث البيانات. أعد تحميل الصفحة لرؤية أحدث نسخة.', true))
       .withFailureHandler(err => showMsg(saveMsg, String(err && err.message || err), false))
-      .clearCaches(adminPin);
+      .clearCaches();
   });
 
   saveAllBtn.addEventListener('click', () => {
-    const payload = { items: state.items, accessRules: state.accessRules };
+    const accessRules = Object.assign({}, state.accessRules);
+    if (!can.editContactRule()) delete accessRules.contactActions; // Level 3 never sends it
+    const payload = { items: state.items, accessRules: accessRules };
+    if (can.manageAdmins()) payload.admins = state.admins;
+    const changedOwnRole = can.manageAdmins() && !state.admins.some(a => a.email === state.myEmail && a.level === 1);
     serverRun
-      .withSuccessHandler(() => { showMsg(saveMsg, 'تم حفظ جميع التغييرات بنجاح.', true); clearDirty(); })
+      .withSuccessHandler(res => {
+        showMsg(saveMsg, 'تم حفظ جميع التغييرات بنجاح.', true);
+        clearDirty();
+        renderShareReport(res && res.sharing);
+        if (changedOwnRole) loadAll(); // you changed or removed your own level — reload with your new rights
+      })
       .withFailureHandler(err => showMsg(saveMsg, String(err && err.message || err), false))
-      .saveAllAdmin(adminPin, payload);
+      .saveAllAdmin(payload);
   });
 
   document.getElementById('adminPanelTrigger').addEventListener('click', () => {
     overlay.classList.add('open');
-    if (adminPin){
-      pinScreen.style.display = 'none';
-      itemsScreen.style.display = '';
-      loadAll();
-    } else {
-      pinScreen.style.display = '';
-      itemsScreen.style.display = 'none';
-      pinInput.value = '';
-      pinInput.focus();
-      showMsg(pinError, '', false);
-    }
+    showMsg(saveMsg, '', false);
+    showMsg(itemsMsg, '', false);
+    shareReportEl.style.display = 'none';
+    sharingResultsEl.innerHTML = '';
+    loadAll();
   });
   document.getElementById('adminModalClose').addEventListener('click', () => {
     if (isDirty && !confirm('يوجد تغييرات غير محفوظة. إغلاق بدون حفظ؟')) return;
@@ -2590,25 +2868,6 @@ function startApp(){
     if (isDirty && !confirm('يوجد تغييرات غير محفوظة. إغلاق بدون حفظ؟')) return;
     overlay.classList.remove('open');
   });
-
-  function submitPin(){
-    const pin = pinInput.value.trim();
-    if (!pin){ showMsg(pinError, 'أدخل رمز الدخول.', false); return; }
-    adminPin = pin;
-    serverRun
-      .withSuccessHandler(res => {
-        pinScreen.style.display = 'none';
-        itemsScreen.style.display = '';
-        state = { items: res.items || [], accessRules: res.accessRules || {}, directory: res.directory || [] };
-        clearDirty();
-        renderAll();
-        switchAdminTab('items');
-      })
-      .withFailureHandler(err => { adminPin = ''; showMsg(pinError, String(err && err.message || err), false); })
-      .getAdminPanelData(pin);
-  }
-  document.getElementById('adminPinSubmit').addEventListener('click', submitPin);
-  pinInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') submitPin(); });
 })();
 
 // Everything is defined — start: sign in (if needed), fetch this
