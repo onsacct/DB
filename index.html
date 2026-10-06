@@ -361,6 +361,8 @@
   .open-btn:hover{background:var(--green-deep); transform:translateY(-1px);}
   .open-btn svg{width:12px; height:12px; transform:scaleX(-1);}
   footer{text-align:center; font-size:12px; color:var(--ink-soft); padding:14px 14px 6px; border-top:1px solid var(--line); margin-top:20px;}
+  .server-version{margin-top:8px; font-size:10.5px; color:var(--ink-soft); opacity:.75; direction:rtl;}
+  .server-version.outdated{opacity:1; color:#9b2c2c; background:#fee2e2; border:1px solid #fecaca; border-radius:6px; padding:6px 8px; font-size:12px; font-weight:700;}
 
   /* Admin control panel */
   #adminPanelTrigger{
@@ -710,7 +712,7 @@
 <main id="pages"></main>
 </div>
 </div>
-<footer>دليل داخلي لتنظيم النماذج والسجلات<br/><button type="button" id="adminPanelTrigger">⚙ لوحة التحكم</button></footer>
+<footer>دليل داخلي لتنظيم النماذج والسجلات<br/><button type="button" id="adminPanelTrigger">⚙ لوحة التحكم</button><div class="server-version" id="serverVersionNote"></div></footer>
 </div>
 
 <!-- Admin control panel: add/update catalog items & their allowed
@@ -978,6 +980,16 @@ async function boot(){
     const res = await callApi('getPageData', []);
     SERVER_DATA = res.data;
     document.getElementById('userEmailMeta').textContent = res.email;
+    // Which Code.gs is live. An old Code.gs doesn't send serverVersion
+    // at all — say so loudly, since that means the latest backend rules
+    // (like blocking unlisted emails) aren't running yet.
+    const versionNote = document.getElementById('serverVersionNote');
+    if (res.serverVersion) {
+      versionNote.textContent = 'إصدار الخادم: ' + res.serverVersion;
+    } else {
+      versionNote.classList.add('outdated');
+      versionNote.textContent = '⚠ الخادم (Apps Script) يعمل بنسخة قديمة من Code.gs — انشر إصداراً جديداً: Deploy ← Manage deployments ← ✏️ ← New version ← Deploy';
+    }
     startApp();
     hideGate();
   } catch(err){
