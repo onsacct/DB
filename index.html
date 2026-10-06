@@ -26,7 +26,12 @@
   ::selection{background:var(--gold-soft); color:var(--ink);}
   a:focus-visible, button:focus-visible, select:focus-visible{outline:2px solid var(--gold); outline-offset:3px; border-radius:2px;}
   @media (prefers-reduced-motion: reduce){*{animation-duration:0.001ms !important; transition-duration:0.001ms !important;}}
-  .wrap{max-width:1400px; margin:0 auto; padding:0 0 24px; width:100%; flex:1; display:flex; flex-direction:column;}
+  .wrap{margin:0 auto; padding:0 0 24px; width:100%; flex:1; display:flex; flex-direction:column;}
+  /* Content is limited to a comfortable reading width on large screens;
+     the green header band still runs edge to edge. */
+  :root{--content-max:1100px;}
+  .wrap > *:not(header){width:100%; max-width:var(--content-max); margin-inline:auto; box-sizing:border-box;}
+  .header-inner{max-width:var(--content-max); margin-inline:auto;}
   header{
     background:var(--green); color:var(--paper); padding:0 clamp(14px,4vw,32px);
     position:sticky; top:0; z-index:100; height:64px; display:flex; align-items:center;
@@ -65,7 +70,7 @@
     appearance:none; -webkit-appearance:none;
     background:var(--green) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' stroke='%23D9B872' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") left 14px center / 11px no-repeat;
     color:var(--paper); border:1px solid rgba(217,184,114,0.4); border-radius:20px;
-    padding:8px 36px 8px 16px; font-family:'Tajawal', sans-serif; font-size:13.5px; font-weight:600; cursor:pointer;
+    padding:8px 16px 8px 36px; font-family:'Tajawal', sans-serif; font-size:13.5px; font-weight:600; cursor:pointer;
     box-shadow:0 2px 5px rgba(0,0,0,0.06); transition:border-color 0.2s;
   }
   select:hover{border-color:var(--gold);}
@@ -365,11 +370,22 @@
   .server-version.outdated{opacity:1; color:#9b2c2c; background:#fee2e2; border:1px solid #fecaca; border-radius:6px; padding:6px 8px; font-size:12px; font-weight:700;}
 
   /* Admin control panel */
-  #adminPanelTrigger{
-    display:inline-block; margin-top:8px; background:none; border:1px solid var(--line); border-radius:14px;
-    color:var(--ink-soft); font-family:'Tajawal', sans-serif; font-size:11.5px; padding:5px 12px; cursor:pointer;
+  /* ⚙ control-panel button in the header — shown only to admins */
+  .header-admin-btn{
+    flex:none; display:inline-flex; align-items:center; gap:4px; background:rgba(217,184,114,0.14);
+    border:1px solid rgba(217,184,114,0.55); color:var(--gold-soft); border-radius:18px; padding:6px 13px;
+    font-family:'Tajawal', sans-serif; font-size:13px; font-weight:700; cursor:pointer; white-space:nowrap;
+    transition:background .15s ease;
   }
-  #adminPanelTrigger:hover{background:var(--paper-deep); color:var(--ink);}
+  .header-admin-btn:hover{background:rgba(217,184,114,0.3);}
+  @media (max-width:600px){ .header-admin-btn .lbl{display:none;} .header-admin-btn{padding:6px 10px; font-size:15px;} }
+  /* Small phones: put "تبديل الحساب" under the email so the site name keeps its room */
+  @media (max-width:420px){
+    .header-inner{gap:8px;}
+    .header-account{display:flex; flex-direction:column; align-items:flex-end; line-height:1.35;}
+    .header-account .sep{display:none;}
+    #userEmailMeta{max-width:44vw;}
+  }
   .admin-overlay{
     position:fixed; inset:0; z-index:200; background:rgba(0,0,0,0.45); display:none;
     align-items:center; justify-content:center; padding:16px;
@@ -616,8 +632,9 @@
 </div>
 <div class="header-meta">
 <div>الأقسام: <b id="metaMain">-</b> · النماذج والسجلات: <b id="metaTotal">-</b></div>
-<div class="header-account"><span id="userEmailMeta"></span> · <button type="button" class="switch-account-btn" id="switchAccountBtn">تبديل الحساب</button></div>
+<div class="header-account"><span id="userEmailMeta"></span><span class="sep"> · </span><button type="button" class="switch-account-btn" id="switchAccountBtn">تبديل الحساب</button></div>
 </div>
+<button type="button" id="adminPanelTrigger" class="header-admin-btn" style="display:none;" title="لوحة التحكم" aria-label="لوحة التحكم">⚙<span class="lbl"> لوحة التحكم</span></button>
 </div>
 </header>
 <!-- Dashboard Section -->
@@ -755,7 +772,7 @@
 <main id="pages"></main>
 </div>
 </div>
-<footer>دليل تنظيم النماذج والسجلات<br/><button type="button" id="adminPanelTrigger" style="display:none;">⚙ لوحة التحكم</button><div class="server-version" id="serverVersionNote"></div></footer>
+<footer>دليل تنظيم النماذج والسجلات<div class="server-version" id="serverVersionNote"></div></footer>
 </div>
 
 <!-- Control panel. The ⚙ button above is shown only to emails on the
@@ -2840,6 +2857,8 @@ function startApp(){
     const payload = { items: state.items, accessRules: accessRules };
     if (can.manageAdmins()) payload.admins = state.admins;
     const changedOwnRole = can.manageAdmins() && !state.admins.some(a => a.email === state.myEmail && a.level === 1);
+    showMsg(saveMsg, 'جارٍ الحفظ…', true);    // replaces any message from a previous save
+    shareReportEl.style.display = 'none';
     serverRun
       .withSuccessHandler(res => {
         showMsg(saveMsg, 'تم حفظ جميع التغييرات بنجاح.', true);
