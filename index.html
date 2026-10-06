@@ -2,7 +2,7 @@
 <html dir="rtl" lang="ar"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>السِجل ولوحة المتابعة</title>
+<title>سِجل الأُنس</title>
 <link href="https://fonts.googleapis.com" rel="preconnect"/>
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
 <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&amp;family=Tajawal:wght@400;500;700;900&amp;display=swap" rel="stylesheet"/>
@@ -533,12 +533,6 @@
     background:var(--green); color:var(--paper); cursor:pointer; text-decoration:none;
   }
   .auth-btn-light{background:#fff; color:var(--green);}
-  .inapp-hint{background:#fff7ed; border:1px solid #fed7aa; border-radius:8px; padding:12px; text-align:right; font-size:13px; color:#7c2d12; margin:4px 0 6px; line-height:1.6;}
-  .inapp-hint p{margin:6px 0;}
-  .inapp-hint .auth-btn{margin-top:4px;}
-  .copy-row{display:flex; gap:6px; margin-top:8px;}
-  .copy-row input{flex:1; min-width:0; font-family:inherit; font-size:12px; padding:7px 8px; border:1px solid var(--line); border-radius:6px; direction:ltr; background:#fff; color:var(--ink);}
-  .copy-row .auth-btn{padding:7px 12px; font-size:12px; margin-top:0;}
 </style>
 </head>
 <body>
@@ -555,17 +549,6 @@
     <div class="gate-signin">
       <p class="auth-hint">سجّل الدخول بحساب Google المسجّل لدى الإدارة.</p>
       <div class="gis-button" id="gisButton"></div>
-      <div class="inapp-hint" id="inAppHint" style="display:none;">
-        <b>⚠ فتحت الرابط من داخل تطبيق</b>
-        <p>Google لا يسمح بتسجيل الدخول داخل التطبيقات (مثل واتساب). افتح الرابط في Chrome أو Safari:</p>
-        <a class="auth-btn" id="openInChromeBtn" style="display:none;">فتح في Chrome</a>
-        <div class="copy-row">
-          <input id="pageUrlInput" readonly aria-label="رابط الصفحة"/>
-          <button type="button" class="auth-btn auth-btn-light" id="copyUrlBtn">نسخ الرابط</button>
-        </div>
-        <p class="auth-small">على iPhone: اضغط ⋯ أو أيقونة المشاركة ثم «فتح في Safari».</p>
-      </div>
-      <p class="auth-small" id="generalBrowserNote">إن لم يظهر زر الدخول أو ظهرت رسالة خطأ من Google، افتح الرابط في Chrome أو Safari (وليس من داخل واتساب).</p>
     </div>
 
     <div class="gate-loading"><span class="spinner" aria-hidden="true"></span> جارٍ التحميل…</div>
@@ -727,7 +710,7 @@
 <main id="pages"></main>
 </div>
 </div>
-<footer>دليل النماذج والسجلات<br/><button type="button" id="adminPanelTrigger">⚙ لوحة التحكم</button></footer>
+<footer>دليل داخلي لتنظيم النماذج والسجلات<br/><button type="button" id="adminPanelTrigger">⚙ لوحة التحكم</button></footer>
 </div>
 
 <!-- Admin control panel: add/update catalog items & their allowed
@@ -855,7 +838,7 @@ function hideGate(){ gateEl().classList.remove('open'); }
 function renderGisButton(){
   if (gisFailed){
     const msgEl = document.getElementById('authGateMsg');
-    msgEl.textContent = 'تعذّر تحميل زر تسجيل الدخول من Google. تحقّق من الاتصال، أو افتح الرابط في Chrome أو Safari، ثم أعد تحميل الصفحة.';
+    msgEl.textContent = 'تعذّر تحميل زر تسجيل الدخول من Google. تحقّق من الاتصال ثم أعد تحميل الصفحة.';
     msgEl.style.display = '';
     return;
   }
@@ -909,35 +892,6 @@ function switchAccount(){
   storeToken(null);
   try { if (window.google && google.accounts && google.accounts.id) google.accounts.id.disableAutoSelect(); } catch(e){}
   location.reload();
-}
-
-// Links opened from inside WhatsApp, Instagram, etc. load in that
-// app's own mini-browser, where Google blocks sign-in. Spot the common
-// ones and show how to reopen the page in a real browser.
-function setupInAppBrowserHint(){
-  const ua = navigator.userAgent || '';
-  const inApp = /FBAN|FBAV|FB_IAB|Instagram|Line\/|Snapchat|WhatsApp|Telegram|TikTok|musical_ly|MicroMessenger|; wv\)/i.test(ua);
-  if (!inApp) return;
-  document.getElementById('inAppHint').style.display = '';
-  document.getElementById('generalBrowserNote').style.display = 'none';
-  const urlInput = document.getElementById('pageUrlInput');
-  urlInput.value = location.href;
-  if (/Android/i.test(ua)){
-    const chromeBtn = document.getElementById('openInChromeBtn');
-    chromeBtn.href = 'intent://' + location.host + location.pathname + location.search +
-      '#Intent;scheme=https;package=com.android.chrome;end';
-    chromeBtn.style.display = '';
-  }
-  document.getElementById('copyUrlBtn').addEventListener('click', () => {
-    const btn = document.getElementById('copyUrlBtn');
-    const done = () => { btn.textContent = 'تم النسخ ✓'; };
-    if (navigator.clipboard && navigator.clipboard.writeText){
-      navigator.clipboard.writeText(location.href).then(done, () => { urlInput.select(); });
-    } else {
-      urlInput.select();
-      try { if (document.execCommand('copy')) done(); } catch(e){}
-    }
-  });
 }
 
 // ---------- Talking to the Apps Script backend ----------
@@ -1004,7 +958,6 @@ async function boot(){
   document.getElementById('retryBtn').addEventListener('click', () => location.reload());
   document.getElementById('gateSwitchBtn').addEventListener('click', switchAccount);
   document.getElementById('switchAccountBtn').addEventListener('click', switchAccount);
-  setupInAppBrowserHint();
 
   if (!configIsSet()){
     showGate('error', 'لم يكتمل الإعداد: ضع رابط Apps Script ومعرّف Google (Client ID) في أعلى ملف index.html.');
