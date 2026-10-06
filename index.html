@@ -3,6 +3,10 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>السِجل ولوحة المعلومات</title>
+<meta content="#1F3B32" name="theme-color"/>
+<link href="manifest.json" rel="manifest"/>
+<link href="icon-192.png" rel="icon" sizes="192x192" type="image/png"/>
+<link href="apple-touch-icon.png" rel="apple-touch-icon"/>
 <link href="https://fonts.googleapis.com" rel="preconnect"/>
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
 <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&amp;family=Tajawal:wght@400;500;700;900&amp;display=swap" rel="stylesheet"/>
@@ -2892,6 +2896,12 @@ function startApp(){
 // Everything is defined — start: sign in (if needed), fetch this
 // user's data, then build the page.
 boot();
+</script>
+<!-- Makes the site installable as a phone app (and lets it be packaged as an Android APK). See sw.js. -->
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js').catch(function(){}); });
+}
 </script>
 <!-- Google's sign-in library. Loaded last, after onGisLoaded() exists. -->
 <script src="https://accounts.google.com/gsi/client" async onload="onGisLoaded()" onerror="onGisFailed()"></script>
