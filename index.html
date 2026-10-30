@@ -642,6 +642,55 @@
     box-shadow:0 6px 18px rgba(0,0,0,0.2); transition:opacity .2s ease, transform .2s ease;
   }
   .share-toast.show{opacity:1; transform:translate(-50%, 0);}
+
+  /* Teachers' notes: 💬 flag with the number of answers (class cards,
+     table rows, and the whole week next to the week picker) */
+  .card-tags{display:flex; align-items:center; gap:6px; flex:none;}
+  .notes-flag{
+    display:inline-flex; align-items:center; gap:4px; padding:3px 8px 3px 6px; border-radius:14px; cursor:pointer;
+    background:#fff6e0; border:1px solid #e8bf62; color:#7a5200; font-family:inherit; font-size:12px; font-weight:700; line-height:1;
+    vertical-align:middle; transition:background .15s ease, border-color .15s ease;
+  }
+  .notes-flag svg{width:14px; height:14px; flex:none;}
+  .notes-flag:hover{background:#ffe9b3; border-color:var(--gold);}
+  .notes-flag .notes-count{min-width:16px; text-align:center;}
+  td.cell-class .notes-flag{margin-inline-start:6px;}
+  .notes-flag-week{padding:7px 14px 7px 10px; border-radius:20px; font-size:13px; gap:6px;}
+  .notes-flag-week .notes-count{background:#b07a12; color:#fff; border-radius:10px; padding:2px 7px;}
+  .notes-overlay{position:fixed; inset:0; z-index:210; background:rgba(0,0,0,0.45); display:none; align-items:center; justify-content:center; padding:16px;}
+  .notes-overlay.open{display:flex;}
+  .notes-modal{background:var(--paper); border-radius:10px; width:100%; max-width:680px; max-height:90vh; display:flex; flex-direction:column; box-shadow:0 10px 30px rgba(0,0,0,0.3); overflow:hidden;}
+  .notes-head{display:flex; align-items:flex-start; justify-content:space-between; gap:12px; padding:14px 16px; background:var(--green); color:var(--paper); flex:none;}
+  .notes-head h3{margin:0; font-size:16px;}
+  .notes-sub{margin:3px 0 0; font-size:12.5px; color:var(--gold-soft);}
+  #notesClose{background:none; border:none; color:var(--paper); font-size:16px; cursor:pointer; padding:4px 6px;}
+  .notes-body{padding:14px 16px 16px; overflow-y:auto; flex:1;}
+  .notes-class + .notes-class{margin-top:16px; padding-top:12px; border-top:1px solid var(--line);}
+  .notes-class h4{margin:0 0 8px; font-size:14px; color:var(--green); display:flex; align-items:center; gap:8px;}
+  .notes-class h4 .notes-count{background:#fff6e0; border:1px solid #e8bf62; color:#7a5200; border-radius:10px; padding:1px 8px; font-size:11.5px;}
+  .note-card{background:#fff; border:1px solid var(--line); border-radius:8px; padding:10px 12px; margin-bottom:8px;}
+  .note-meta{display:flex; justify-content:space-between; align-items:center; gap:8px; font-size:12.5px; color:var(--ink-soft); margin-bottom:6px;}
+  .note-meta b{color:var(--ink); font-size:13.5px;}
+  .note-row{margin-top:6px;}
+  .note-q{display:block; font-size:11.5px; font-weight:700; color:var(--ink-soft); margin-bottom:2px;}
+  .note-row p{margin:0; font-size:14px; line-height:1.7; white-space:pre-line; overflow-wrap:anywhere; color:var(--ink);}
+  .note-missing p{color:#7a3a0a; font-weight:600;}
+  @media (max-width:768px){
+    .notes-overlay{padding:10px;}
+    .notes-modal{max-height:92vh;}
+    .notes-flag-week{width:100%; justify-content:center;}
+  }
+
+  /* Classes that haven't recorded the selected week: one red chip each */
+  .pill-sub.missing-classes{display:flex; flex-wrap:wrap; justify-content:center; align-items:center; gap:6px; margin-top:8px; font-size:13px;}
+  .missing-classes-label{color:rgba(239,233,214,0.85); font-weight:700; margin-inline-end:2px;}
+  .missing-class-chip{
+    display:inline-flex; align-items:center; gap:5px; padding:4px 10px; border-radius:16px;
+    background:#fde4e4; color:#9b1c1c; border:1px solid #f3a5a5; font-size:12.5px; font-weight:700; white-space:nowrap;
+  }
+  .missing-class-chip svg{width:13px; height:13px; flex:none; color:#c62828;}
+  /* Phones: the wide "status" card no longer squeezes the other cards into two narrow columns */
+  @media (max-width:768px){ .summary-banner > *{grid-column:auto !important;} }
 </style>
 </head>
 <body>
@@ -697,6 +746,7 @@
 <label for="weekSelect">الأسبوع والتاريخ:</label>
 <select aria-label="اختر الأسبوع" id="weekSelect"></select>
 </div>
+<button type="button" class="notes-flag notes-flag-week" id="weekNotesBtn" style="display:none;" title="ملاحظات المعلمين لهذا الأسبوع"></button>
 </div>
 </div>
 
@@ -821,6 +871,19 @@
 </div>
 </div>
 <footer>دليل تنظيم النماذج والسجلات<div class="server-version" id="serverVersionNote"></div></footer>
+</div>
+
+<!-- Teachers' notes window: answers to "الملاحظات والاقتراحات" and
+     "هل هناك اسم طالب غير موجود في القائمة" for one class (or the whole
+     week), opened from the 💬 flags on the weekly dashboard. -->
+<div id="notesOverlay" class="notes-overlay" role="dialog" aria-modal="true" aria-labelledby="notesTitle">
+  <div class="notes-modal">
+    <div class="notes-head">
+      <div><h3 id="notesTitle">ملاحظات المعلمين</h3><p class="notes-sub" id="notesSub"></p></div>
+      <button type="button" id="notesClose" aria-label="إغلاق">✕</button>
+    </div>
+    <div class="notes-body" id="notesBody"></div>
+  </div>
 </div>
 
 <!-- Control panel. The ⚙ button above is shown only to emails on the
@@ -1348,6 +1411,56 @@ function setupAttendanceDashboard(dash){
 
   const WARN_ICON = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/></svg>`;
 
+  // ---- Teachers' notes (from the attendance form) ----
+  // week.notes = { classCode: [ { teacher, time, notes, missing } ] },
+  // sent only to people allowed to see this dashboard. Every answer
+  // other than "لا، لا يوجد ذلك." counts once.
+  const NOTES_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M8 9h8M8 13h5"/></svg>`;
+  const answersIn = list => (list || []).reduce((n, a) => n + (a.notes ? 1 : 0) + (a.missing ? 1 : 0), 0);
+  const classNotesCount = (wk, code) => answersIn(wk && wk.notes && wk.notes[code]);
+  const weekNotesCount = wk => (wk && wk.notes) ? Object.keys(wk.notes).reduce((n, c) => n + answersIn(wk.notes[c]), 0) : 0;
+  const escText = v => String(v == null ? '' : v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  function notesFlag(wk, code){
+    const n = classNotesCount(wk, code);
+    if (!n) return '';
+    return `<button type="button" class="notes-flag" data-notes-code="${escText(code)}" title="ملاحظات المعلمين" aria-label="ملاحظات المعلمين — ${escText(classInfo[code])}: ${toArabicNum(n)}">${NOTES_ICON}<span class="notes-count">${toArabicNum(n)}</span></button>`;
+  }
+  function noteDate(t){
+    const d = new Date(t);
+    return isNaN(d.getTime()) ? escText(t) : toArabicNum(d.getDate()) + '/' + toArabicNum(d.getMonth() + 1) + '/' + toArabicNum(d.getFullYear());
+  }
+  function openNotes(wk, code){
+    if (!wk || !wk.notes) return;
+    const codes = code ? [code] : classOrder.filter(c => wk.notes[c] && wk.notes[c].length);
+    const card = a => `
+      <article class="note-card">
+        <div class="note-meta"><b>${escText(a.teacher || '—')}</b>${a.time ? `<span>${noteDate(a.time)}</span>` : ''}</div>
+        ${a.notes ? `<div class="note-row"><span class="note-q">الملاحظات والاقتراحات</span><p>${escText(a.notes)}</p></div>` : ''}
+        ${a.missing ? `<div class="note-row note-missing"><span class="note-q">اسم طالب غير موجود في القائمة</span><p>${escText(a.missing)}</p></div>` : ''}
+      </article>`;
+    document.getElementById('notesSub').textContent = code ? (classInfo[code] + ' — ' + formatWeekLabel(wk)) : formatWeekLabel(wk);
+    document.getElementById('notesBody').innerHTML = codes.map(c => `
+      <section class="notes-class">
+        ${code ? '' : `<h4>${escText(classInfo[c])} <span class="notes-count">${toArabicNum(classNotesCount(wk, c))}</span></h4>`}
+        ${(wk.notes[c] || []).map(card).join('')}
+      </section>`).join('') || '<div class="empty-state-card">لا توجد ملاحظات.</div>';
+    document.getElementById('notesOverlay').classList.add('open');
+    document.getElementById('notesClose').focus();
+  }
+  (function wireNotesWindow(){
+    const ov = document.getElementById('notesOverlay');
+    const close = () => ov.classList.remove('open');
+    document.getElementById('notesClose').addEventListener('click', close);
+    ov.addEventListener('click', e => { if (e.target === ov) close(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && ov.classList.contains('open')) close(); });
+    document.getElementById('dashboardSection').addEventListener('click', e => {
+      const flag = e.target.closest('.notes-flag');
+      if (!flag) return;
+      const selected = weeks.find(w => w.id == document.getElementById('weekSelect').value);
+      openNotes(selected, flag.dataset.notesCode || null);
+    });
+  })();
+
   // Populate Week Selector
   const weekSelect = document.getElementById('weekSelect');
   weekSelect.innerHTML = '';
@@ -1401,6 +1514,11 @@ function setupAttendanceDashboard(dash){
 
   function renderDashboard(){
     const week = weeks.find(w => w.id == weekSelect.value);
+    const weekBtn = document.getElementById('weekNotesBtn');
+    const nWeek = weekNotesCount(week);
+    weekBtn.style.display = nWeek ? '' : 'none';
+    weekBtn.innerHTML = nWeek ? `${NOTES_ICON}<span class="notes-label">ملاحظات المعلمين</span><span class="notes-count">${toArabicNum(nWeek)}</span>` : '';
+    weekBtn.setAttribute('aria-label', 'ملاحظات المعلمين لهذا الأسبوع: ' + toArabicNum(nWeek));
     const summaryBanner = document.getElementById('summaryBanner');
     const tableBody = document.getElementById('tableBody');
     const grid = document.getElementById('classGrid');
@@ -1582,8 +1700,9 @@ function setupAttendanceDashboard(dash){
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/></svg>
               حالة تسجيل الفصول لهذا الأسبوع (${toArabicNum(recordedCodes.length)}/${toArabicNum(classOrder.length)})
             </div>
-            <div class="pill-sub" style="font-size:13.5px;">
-              لم يُسجَّل بعد: ${missingNames.join('، ')}
+            <div class="pill-sub missing-classes">
+              <span class="missing-classes-label">لم يُسجَّل بعد:</span>
+              ${missingNames.map(n => `<span class="missing-class-chip" title="لم يُسجَّل بعد">${WARN_ICON}${n}</span>`).join('')}
             </div>
           </div>
         </div>`;
@@ -1622,6 +1741,7 @@ function setupAttendanceDashboard(dash){
           <td class="cell-class">
             ${classInfo[code]}
             ${isTop ? '<span style="color:var(--gold); margin-inline-start:4px; font-size:12px; font-weight:bold;">★ الأعلى</span>' : ''}
+            ${notesFlag(week, code)}
           </td>
           <td style="text-align:center; font-weight:600;">${toArabicNum(cap)}</td>
           <td style="text-align:center; font-weight:700; color:${isUnrecorded ? '#9a3412' : 'var(--green)'};">${isUnrecorded ? '—' : toArabicNum(attended)}</td>
@@ -1673,7 +1793,7 @@ function setupAttendanceDashboard(dash){
               <div>
                 <div class="class-name">${classInfo[code]}</div>
               </div>
-              ${statusMarkup}
+              <div class="card-tags">${notesFlag(week, code)}${statusMarkup}</div>
             </div>
             <div class="class-figures">
               <div>
@@ -2447,16 +2567,18 @@ function startApp(){
       options: [['viewer', 'مشاهدة'], ['editor', 'تعديل'], ['none', 'بدون مشاركة تلقائية']] }
   ];
   const SHARE_LABELS = { viewer: 'مشاهدة', editor: 'تعديل', none: 'بدون مشاركة تلقائية' };
-  const ACCESS_RULE_NAMES_CLIENT = ['attendanceDashboard', 'studentStats', 'contactActions'];
+  const ACCESS_RULE_NAMES_CLIENT = ['attendanceDashboard', 'studentStats', 'contactActions', 'teacherNotes'];
   const ACCESS_RULE_LABELS = {
     attendanceDashboard: 'لوحة الحضور الأسبوعية',
     studentStats: 'لوحة إحصاءات الطلاب',
-    contactActions: 'أزرار التواصل (اتصال / واتساب)'
+    contactActions: 'أزرار التواصل (اتصال / واتساب)',
+    teacherNotes: 'ملاحظات المعلمين (تظهر في لوحة الحضور الأسبوعية)'
   };
   const ACCESS_RULE_SHORT_LABELS = {
     attendanceDashboard: 'الحضور',
     studentStats: 'الإحصاءات',
-    contactActions: 'التواصل'
+    contactActions: 'التواصل',
+    teacherNotes: 'الملاحظات'
   };
   const LEVEL_LABELS = { 1: 'المستوى ١', 2: 'المستوى ٢', 3: 'المستوى ٣' };
 
